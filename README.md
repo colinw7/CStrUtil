@@ -1,0 +1,4 @@
+CStrUtil
+========
+
+String Utility Library
