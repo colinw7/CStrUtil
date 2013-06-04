@@ -13,11 +13,16 @@ all: $(LIB_DIR)/libCStrUtil.a
 
 SRC = \
 CStrUtil.cpp \
-CPrintF.cpp
+CPrintF.cpp \
+CFmtString.cpp \
+CStrParse.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-I$(INC_DIR) \
+-I../../CUtil/include \
+-I.
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o
