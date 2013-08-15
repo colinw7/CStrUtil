@@ -309,6 +309,8 @@ namespace CStrUtil {
 
   int casecmp(const std::string &str1, const std::string &str2);
 
+  std::string::size_type casefind(const std::string &str1, const std::string &str2);
+
   bool equal(char *str1, char *str2);
 
   std::string concatFileNames(const std::string &lhs,

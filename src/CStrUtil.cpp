@@ -3868,6 +3868,13 @@ casecmp(const std::string &str1, const std::string &str2)
   return cmp(CStrUtil::toLower(str1), CStrUtil::toLower(str2));
 }
 
+std::string::size_type
+CStrUtil::
+casefind(const std::string &str1, const std::string &str2)
+{
+  return CStrUtil::toLower(str1).find(CStrUtil::toLower(str2));
+}
+
 bool
 CStrUtil::
 equal(char *str1, char *str2)
