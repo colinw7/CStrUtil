@@ -5,9 +5,6 @@
 #include <vector>
 
 class CPrintF {
- private:
-  std::string format_;
-
  public:
 #ifdef _HAS_LONG_LONG
   typedef long long LLong;
@@ -26,9 +23,12 @@ class CPrintF {
     PRECISION_AS_VALUE   = (1<<6)
   };
 
-  CPrintF(const std::string &format);
+  CPrintF(const std::string &format="");
 
   virtual ~CPrintF() { }
+
+  const std::string &formatString() const { return format_; }
+  void setFormatString(const std::string &fmt) { format_ = fmt; }
 
   std::string format() const;
 
@@ -46,8 +46,7 @@ class CPrintF {
   static bool readStringFormat (const std::string &str, int *pos, std::string &format);
 
   template<typename T1>
-  static std::string
-  format(const char *fmt, const T1 &t1) {
+  static std::string format(const char *fmt, const T1 &t1) {
     std::vector<std::string> strs;
 
     strs.push_back(CConv::toString(t1));
@@ -56,8 +55,7 @@ class CPrintF {
   }
 
   template<typename T1, typename T2>
-  static std::string
-  format(const char *fmt, const T1 &t1, const T2 &t2) {
+  static std::string format(const char *fmt, const T1 &t1, const T2 &t2) {
     std::vector<std::string> strs;
 
     strs.push_back(CConv::toString(t1));
@@ -66,8 +64,10 @@ class CPrintF {
     return formatStrings(fmt, strs);
   }
 
-  static std::string
-  formatStrings(const char *fmt, const std::vector<std::string> &strs);
+  static std::string formatStrings(const char *fmt, const std::vector<std::string> &strs);
+
+ private:
+  std::string format_;
 };
 
 #endif
