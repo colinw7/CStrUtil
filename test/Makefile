@@ -16,7 +16,10 @@ CStrUtilTest.cpp
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-std=c++11 \
+-I$(INC_DIR) \
+-I.
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o
