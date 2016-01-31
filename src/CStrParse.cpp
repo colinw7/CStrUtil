@@ -1,10 +1,8 @@
 #include <CStrParse.h>
 #include <CStrUtil.h>
 
-using std::string;
-
 CStrParse::
-CStrParse(const string &str) :
+CStrParse(const std::string &str) :
  auto_skip_space_(false)
 {
   setString(str);
@@ -12,7 +10,7 @@ CStrParse(const string &str) :
 
 void
 CStrParse::
-setString(const string &str)
+setString(const std::string &str)
 {
   str_ = str;
   pos_ = 0;
@@ -36,21 +34,21 @@ setPos(int pos)
     pos_ = pos;
 }
 
-string
+std::string
 CStrParse::
 getBefore() const
 {
   return str_.substr(0, pos_);
 }
 
-string
+std::string
 CStrParse::
 getAt() const
 {
   return getAt(pos_);
 }
 
-string
+std::string
 CStrParse::
 getAt(uint pos) const
 {
@@ -60,7 +58,7 @@ getAt(uint pos) const
     return "";
 }
 
-string
+std::string
 CStrParse::
 getAt(uint pos, uint len) const
 {
@@ -70,7 +68,7 @@ getAt(uint pos, uint len) const
     return getAt(pos);
 }
 
-string
+std::string
 CStrParse::
 getAfter() const
 {
@@ -217,7 +215,7 @@ skipToEnd()
 
 bool
 CStrParse::
-readNonSpace(string &text)
+readNonSpace(std::string &text)
 {
   int pos = pos_;
 
@@ -259,7 +257,7 @@ unreadChar()
 
 bool
 CStrParse::
-unreadString(const string &str)
+unreadString(const std::string &str)
 {
   uint len = str.size();
 
@@ -319,7 +317,7 @@ readReal(double *real)
 
 bool
 CStrParse::
-readString(string &str, bool strip_quotes)
+readString(std::string &str, bool strip_quotes)
 {
   autoSkipSpace();
 
@@ -351,7 +349,7 @@ skipToChar(char c)
 
 bool
 CStrParse::
-readToChar(char c, string &text)
+readToChar(char c, std::string &text)
 {
   text = "";
 
@@ -373,7 +371,7 @@ isIdentifier(int offset)
 
 bool
 CStrParse::
-readIdentifier(string &identifier)
+readIdentifier(std::string &identifier)
 {
   autoSkipSpace();
 
@@ -382,7 +380,7 @@ readIdentifier(string &identifier)
 
 bool
 CStrParse::
-readRealFormat(string &real_format)
+readRealFormat(std::string &real_format)
 {
   autoSkipSpace();
 
@@ -391,7 +389,7 @@ readRealFormat(string &real_format)
 
 bool
 CStrParse::
-readIntegerFormat(string &integer_format)
+readIntegerFormat(std::string &integer_format)
 {
   autoSkipSpace();
 
@@ -400,7 +398,7 @@ readIntegerFormat(string &integer_format)
 
 bool
 CStrParse::
-readStringFormat(string &string_format)
+readStringFormat(std::string &string_format)
 {
   autoSkipSpace();
 
@@ -510,7 +508,7 @@ isNextChar(char c) const
 
 bool
 CStrParse::
-isString(const string &str) const
+isString(const std::string &str) const
 {
   int len = str.size();
 
@@ -526,16 +524,16 @@ isString(const string &str) const
 
 bool
 CStrParse::
-isOneOf(const string &str) const
+isOneOf(const std::string &str) const
 {
   autoSkipSpace();
 
-  return (pos_ < len_ && str.find(str_[pos_]) != string::npos);
+  return (pos_ < len_ && str.find(str_[pos_]) != std::string::npos);
 }
 
 bool
 CStrParse::
-isWord(const string &str) const
+isWord(const std::string &str) const
 {
   int len = str.size();
 

@@ -1,6 +1,6 @@
 #include <CStrUtil.h>
-#include <CThrow.h>
 #include <CPrintF.h>
+#include <CThrow.h>
 
 //#define ALLOW_NAN 1
 
@@ -345,8 +345,8 @@ std::string
 CStrUtil::
 toOctStringInWidth(int integer, uint width)
 {
-  int digits [width];
-  int factors[width];
+  std::vector<int> digits ; digits .resize(width);
+  std::vector<int> factors; factors.resize(width);
 
   factors[0] = 1;
 
@@ -3172,11 +3172,11 @@ std::string
 CStrUtil::
 replaceEscapeCodes(const std::string &str)
 {
-  uint len = str.size();
+  int len = str.size();
 
   bool has_escape = false;
 
-  for (uint i = 0; i < len - 1; ++i)
+  for (int i = 0; i < len - 1; ++i)
     if (str[i] == '\\') {
       has_escape = true;
       break;
@@ -3187,7 +3187,7 @@ replaceEscapeCodes(const std::string &str)
 
   std::string str1;
 
-  uint i = 0;
+  int i = 0;
 
   while (i < len - 1) {
     if (str[i] != '\\') {
@@ -3447,9 +3447,9 @@ removeEscapeChars(const std::string &str)
 {
   std::string str1;
 
-  uint len = str.size();
+  int len = str.size();
 
-  uint i = 0;
+  int i = 0;
 
   while (i < len) {
     if (i < len - 1 && str[i] == '\\')
@@ -3673,7 +3673,7 @@ char *
 CStrUtil::
 strstr(const char *str1, const char *str2)
 {
-  uint len = strlen(str1);
+  int len = strlen(str1);
 
   char *p1 = (char *) str1;
   char *p2 = (char *) &str1[len - 1];
@@ -3685,7 +3685,7 @@ char *
 CStrUtil::
 strrstr(const char *str1, const char *str2)
 {
-  uint len = strlen(str1);
+  int len = strlen(str1);
 
   char *p1 = (char *) &str1[len - 1];
   char *p2 = (char *) str1;
@@ -3761,7 +3761,7 @@ char *
 CStrUtil::
 strchr(const char *str, char c)
 {
-  uint len = strlen(str);
+  int len = strlen(str);
 
   char *p1 = (char *) str;
   char *p2 = (char *) &str[len - 1];
@@ -3773,7 +3773,7 @@ char *
 CStrUtil::
 strrchr(const char *str, char c)
 {
-  uint len = strlen(str);
+  int len = strlen(str);
 
   char *p1 = (char *) &str[len - 1];
   char *p2 = (char *) str;
@@ -3886,13 +3886,13 @@ std::string
 CStrUtil::
 concatFileNames(const std::string &lhs, const std::string &rhs)
 {
-  uint l2 = lhs.size();
+  int l2 = lhs.size();
 
   while (l2 > 0 && lhs[l2 - 1] == '/')
     l2--;
 
-  uint r1 = 0;
-  uint r2 = rhs.size();
+  int r1 = 0;
+  int r2 = rhs.size();
 
   while (r1 < r2 && rhs[r1] == '/')
     ++r1;
@@ -4082,11 +4082,11 @@ std::string
 CStrUtil::
 caseSepToUnderscoreSep(const std::string &str)
 {
-  uint len = str.size();
+  int len = str.size();
 
   std::string str1;
 
-  for (uint i = 0; i < len; ++i) {
+  for (int i = 0; i < len; ++i) {
     if (i > 0 && ::isupper(str[i])) {
       str1 += "_";
       str1 += tolower(str[i]);
@@ -4102,11 +4102,11 @@ std::string
 CStrUtil::
 underscoreSepToCaseSep(const std::string &str)
 {
-  uint len = str.size();
+  int len = str.size();
 
   std::string str1;
 
-  for (uint i = 0; i < len; ++i) {
+  for (int i = 0; i < len; ++i) {
     if (i > 0 && i < len - 1 && str[i] == '_' &&
         (::islower(str[i + 1]) || ::isdigit(str[i + 1]))) {
       ++i;
@@ -4658,8 +4658,7 @@ readRealFormat(const std::string &str, uint *pos, std::string &format)
   char length_modifier;
   int  field_width, precision;
 
-  if (! readFormat(str, pos, format,
-                   &field_width, &precision, &length_modifier,
+  if (! readFormat(str, pos, format, &field_width, &precision, &length_modifier,
                    &format_code, &flags))
     return false;
 
@@ -4678,8 +4677,7 @@ readIntegerFormat(const std::string &str, uint *pos, std::string &format)
   char length_modifier;
   int  field_width, precision;
 
-  if (! readFormat(str, pos, format,
-                   &field_width, &precision, &length_modifier,
+  if (! readFormat(str, pos, format, &field_width, &precision, &length_modifier,
                    &format_code, &flags))
     return false;
 
@@ -4698,8 +4696,7 @@ readStringFormat(const std::string &str, uint *pos, std::string &format)
   char length_modifier;
   int  field_width, precision;
 
-  if (! readFormat(str, pos, format,
-                   &field_width, &precision, &length_modifier,
+  if (! readFormat(str, pos, format, &field_width, &precision, &length_modifier,
                    &format_code, &flags))
     return false;
 
