@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include <cstdarg>
 #include <sys/types.h>
 
@@ -65,18 +66,26 @@ namespace CStrUtil {
   std::string toString(long integer);
   std::string toString(ulong integer);
   std::string toString(double real);
-  std::string toString(const std::vector<std::string> &words,
+  std::string toString(const std::vector<std::string> &words, const std::string &sep="");
+  std::string toString(const std::vector<std::string> &words, int start, int end=-1,
                        const std::string &sep="");
-  std::string toString(const std::vector<std::string> &words,
-                       int start, int end=-1, const std::string &sep="");
-  std::string toString(const char **words, uint num_words,
-                       int start, int end=-1, const std::string &sep="");
-  std::string toString(const char **words, uint num_words,
+  std::string toString(const char **words, uint num_words, int start, int end=-1,
                        const std::string &sep="");
+  std::string toString(const char **words, uint num_words, const std::string &sep="");
   std::string toString(std::vector<std::string>::const_iterator pstr1,
                        std::vector<std::string>::const_iterator pstr2,
                        const std::string &sep="");
   std::string toString(const CStrWords &words, const std::string &sep="");
+
+  template<typename T>
+  std::string valuesToString(const std::vector<T> &values, const std::string &sep=" ") {
+    std::stringstream ss;
+    for (uint i = 0; i < values.size(); ++i) {
+      if (i > 0) ss << sep;
+      ss << values[i];
+    }
+    return ss.str();
+  }
 
   bool decodeHexString(const std::string &str, uint *value);
   bool decodeHexChar(unsigned char c, uint *value);

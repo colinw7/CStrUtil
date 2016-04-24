@@ -583,7 +583,7 @@ isBaseInteger(const std::string &str, uint base)
   while (i < len) {
     int c = str[i];
 
-    if (! isBaseChar(c, base, NULL))
+    if (! isBaseChar(c, base, 0))
       return false;
 
     ++i;
@@ -821,7 +821,7 @@ isBaseChar(int c, uint base, int *value)
     return false;
   }
 
-  if (value != NULL)
+  if (value)
     *value = int(pos);
 
   return true;
@@ -1633,7 +1633,7 @@ CStrWords
 CStrUtil::
 toWords(const std::string &str, CWordDef *def)
 {
-  if (def == NULL)
+  if (! def)
     def = &word_def_;
 
   CStrWords words(str);
@@ -1670,7 +1670,7 @@ void
 CStrUtil::
 addWords(const std::string &str, std::vector<std::string> &words, CWordDef *def)
 {
-  if (def == NULL)
+  if (! def)
     def = &word_def_;
 
   uint len = str.size();
@@ -1761,7 +1761,7 @@ CStrWord
 CStrUtil::
 readWord(const std::string &str, uint *pos, CWordDef *def)
 {
-  if (def == NULL)
+  if (! def)
     def = &word_def_;
 
   uint len = str.size();
@@ -2284,7 +2284,7 @@ CStrUtil::
 toTokens(const std::string &str, const std::string &separators)
 {
   if (separators.size() == 0)
-    return toWords(str, NULL);
+    return toWords(str, 0);
 
   //------
 
@@ -2366,7 +2366,7 @@ readInteger(const std::string &str, uint *pos, int *integer)
 
   //------
 
-  if (integer != NULL) {
+  if (integer) {
     if (! toInteger(str.substr(i, *pos - i), integer))
       return false;
   }
@@ -2393,7 +2393,7 @@ readInteger(const char *str, uint *pos, int *integer)
 
   //------
 
-  if (integer != NULL) {
+  if (integer) {
     if (! toInteger(std::string(&str[i], *pos - i), integer))
       return false;
   }
@@ -2420,7 +2420,7 @@ readBaseInteger(const std::string &str, uint base, uint *pos, int *integer)
 
   //------
 
-  if (integer != NULL)
+  if (integer)
     *integer = toBaseInteger(str.substr(i, *pos - i), base);
 
   //------
@@ -2445,7 +2445,7 @@ readBaseInteger(const char *str, uint base, uint *pos, int *integer)
 
   //------
 
-  if (integer != NULL)
+  if (integer)
     *integer = toBaseInteger(std::string(&str[i], *pos - i), base);
 
   //------
@@ -2500,12 +2500,12 @@ skipBaseInteger(const std::string &str, uint base, uint *pos)
   if (*pos < len && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
 
-  if (*pos >= len || ! isBaseChar(str[*pos], base, NULL))
+  if (*pos >= len || ! isBaseChar(str[*pos], base, 0))
     return false;
 
   ++(*pos);
 
-  while (*pos < len && isBaseChar(str[*pos], base, NULL))
+  while (*pos < len && isBaseChar(str[*pos], base, 0))
     ++(*pos);
 
   return true;
@@ -2518,12 +2518,12 @@ skipBaseInteger(const char *str, uint base, uint *pos)
   if (str[*pos] != '\0' && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
 
-  if (str[*pos] == '\0' || ! isBaseChar(str[*pos], base, NULL))
+  if (str[*pos] == '\0' || ! isBaseChar(str[*pos], base, 0))
     return false;
 
   ++(*pos);
 
-  while (str[*pos] != '\0' && isBaseChar(str[*pos], base, NULL))
+  while (str[*pos] != '\0' && isBaseChar(str[*pos], base, 0))
     ++(*pos);
 
   return true;
@@ -2666,7 +2666,7 @@ readReal(const char *str, uint *pos, double *real)
   if (number_str.size() == 0)
     return false;
 
-  if (real != NULL) {
+  if (real) {
     if (! toReal(number_str, real))
       return false;
   }
@@ -3058,7 +3058,7 @@ bool
 CStrUtil::
 isCOperatorChar(char c)
 {
-  return (strchr("()[]+-*/%<>=&|!~^.?:", c) != NULL);
+  return (strchr("()[]+-*/%<>=&|!~^.?:", c) != 0);
 }
 
 bool
@@ -3103,7 +3103,7 @@ bool
 CStrUtil::
 isCSeparatorChar(char c)
 {
-  return (strchr("{};,", c) != NULL);
+  return (strchr("{};,", c) != 0);
 }
 
 bool
@@ -3118,7 +3118,7 @@ replaceCTriGraphs(std::string &line)
   while (pos < len) {
     if (pos < len + 2 &&
         line[pos] == '?' && line[pos + 1] == '?' &&
-        strchr("=/'()!<>-", line[pos + 2]) != NULL) {
+        strchr("=/'()!<>-", line[pos + 2]) != 0) {
       /* Replace Trigraph */
 
       if      (line[pos + 2] == '=')
@@ -4153,7 +4153,7 @@ getIsCType(const std::string &is_type)
   else if (CStrUtil::casecmp(is_type, "xdigit") == 0)
     return CStrUtil::isxdigit;
   else
-    return NULL;
+    return 0;
 }
 
 /* isalnum for machines which only have macro */
@@ -4557,7 +4557,7 @@ readFormat(const std::string &str, uint *pos, std::string &format,
 
   /* Optional '-+ #0' chars (multiples valid ?) */
 
-  while (*pos < len && strchr("-+ #0", str[*pos]) != NULL) {
+  while (*pos < len && strchr("-+ #0", str[*pos]) != 0) {
     if      (str[*pos] == '-')
       *flags |= CPRINTF_LEFT_JUSTIFY;
     else if (str[*pos] == '+')
@@ -4662,7 +4662,7 @@ readRealFormat(const std::string &str, uint *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("feEgG", format_code) == NULL)
+  if (strchr("feEgG", format_code) == 0)
     return false;
 
   return true;
@@ -4681,7 +4681,7 @@ readIntegerFormat(const std::string &str, uint *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("diouxXc", format_code) == NULL)
+  if (strchr("diouxXc", format_code) == 0)
     return false;
 
   return true;
