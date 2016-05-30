@@ -36,13 +36,6 @@ setPos(int pos)
 
 std::string
 CStrParse::
-getBefore() const
-{
-  return str_.substr(0, pos_);
-}
-
-std::string
-CStrParse::
 getAt() const
 {
   return getAt(pos_);
@@ -66,6 +59,18 @@ getAt(uint pos, uint len) const
     return str_.substr(pos, len);
   else
     return getAt(pos);
+}
+
+std::string
+CStrParse::
+getBefore(uint pos) const
+{
+  if      (pos < len_ && pos < pos_)
+    return str_.substr(pos, pos_ - pos);
+  else if (pos < len_)
+    return str_.substr(pos);
+  else
+    return "";
 }
 
 std::string

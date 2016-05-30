@@ -27,10 +27,10 @@ class CStrParse {
 
   virtual void setPos(int pos);
 
-  virtual std::string getBefore() const;
   virtual std::string getAt    () const;
   virtual std::string getAt    (uint pos) const;
   virtual std::string getAt    (uint pos, uint len) const;
+  virtual std::string getBefore(uint pos=0) const;
   virtual std::string getAfter () const;
 
   virtual char getCharBefore(uint offset = 1) const;
