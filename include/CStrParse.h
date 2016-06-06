@@ -93,6 +93,10 @@ class CStrParse {
 
   virtual bool eof() const;
 
+  virtual std::string stateStr() const {
+    return getBefore() + getCharAt() + "\b_" + getAfter();
+  }
+
  private:
   std::string            str_;
   uint                   pos_;
