@@ -1,5 +1,6 @@
 #include <CStrParse.h>
 #include <CStrUtil.h>
+#include <cassert>
 
 CStrParse::
 CStrParse(const std::string &str) :
@@ -234,6 +235,17 @@ readNonSpace(std::string &text)
   return true;
 }
 
+char
+CStrParse::
+readChar()
+{
+  autoSkipSpace();
+
+  assert(! eof());
+
+  return str_[pos_++];
+}
+
 bool
 CStrParse::
 readChar(char *c)
@@ -463,6 +475,13 @@ isDigit() const
   autoSkipSpace();
 
   return (pos_ < len_ && isdigit(str_[pos_]));
+}
+
+bool
+CStrParse::
+isDigitAt(int offset) const
+{
+  return (pos_ + offset < len_ && isdigit(str_[pos_ + offset]));
 }
 
 bool

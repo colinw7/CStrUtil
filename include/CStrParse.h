@@ -50,6 +50,7 @@ class CStrParse {
   virtual bool readNonSpace(std::string &text);
 
   virtual bool readChar(char *c);
+  virtual char readChar();
   virtual bool unreadChar();
 
   virtual bool unreadString(const std::string &str);
@@ -78,6 +79,7 @@ class CStrParse {
   virtual bool isUpper() const;
   virtual bool isAlnum() const;
   virtual bool isDigit() const;
+  virtual bool isDigitAt(int offset) const;
   virtual bool isODigit() const;
   virtual bool isXDigit() const;
 
