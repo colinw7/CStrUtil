@@ -41,6 +41,7 @@ class CStrParse {
   virtual void skipNonSpace();
   virtual bool skipChar();
   virtual bool skipChar(char c);
+  virtual bool skipChars(const std::string &s);
   virtual bool skipChars(uint n);
   virtual bool skipString();
   virtual void skipToEnd();

@@ -177,6 +177,13 @@ skipChar(char c)
 
 bool
 CStrParse::
+skipChars(const std::string &s)
+{
+  return skipChars(s.size());
+}
+
+bool
+CStrParse::
 skipChars(uint n)
 {
   if (pos_ + n > len_) {
