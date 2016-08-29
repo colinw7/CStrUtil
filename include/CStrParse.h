@@ -27,6 +27,8 @@ class CStrParse {
 
   virtual void setPos(int pos);
 
+  int lineNum() const { return lineNum_; }
+
   virtual std::string getAt    () const;
   virtual std::string getAt    (uint pos) const;
   virtual std::string getAt    (uint pos, uint len) const;
@@ -101,10 +103,14 @@ class CStrParse {
   }
 
  private:
+  void updateNL(int pos1, int pos2, int d=1);
+
+ private:
   std::string            str_;
-  uint                   pos_;
-  std::string::size_type len_;
-  bool                   auto_skip_space_;
+  uint                   pos_ { 0 };
+  std::string::size_type len_ { 0 };
+  bool                   auto_skip_space_ { false };
+  int                    lineNum_ { 0 };
 };
 
 #endif

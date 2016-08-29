@@ -3,8 +3,7 @@
 #include <cassert>
 
 CStrParse::
-CStrParse(const std::string &str) :
- auto_skip_space_(false)
+CStrParse(const std::string &str)
 {
   setString(str);
 }
@@ -119,7 +118,11 @@ skipSpace()
 {
   if (eof()) return;
 
+  int pos1 = pos_;
+
   CStrUtil::skipSpace(str_, &pos_);
+
+  updateNL(pos1, pos_);
 }
 
 void
@@ -153,6 +156,9 @@ skipChar()
   if (eof())
     return false;
 
+  if (str_[pos_] == '\n')
+    ++lineNum_;
+
   ++pos_;
 
   return true;
@@ -169,6 +175,9 @@ skipChar(char c)
 
   if (str_[pos_] != c)
     return false;
+
+  if (str_[pos_] == '\n')
+    ++lineNum_;
 
   ++pos_;
 
@@ -191,7 +200,11 @@ skipChars(uint n)
     return false;
   }
 
+  int pos1 = pos_;
+
   pos_ += n;
+
+  updateNL(pos1, pos_);
 
   return true;
 }
@@ -205,6 +218,8 @@ skipString()
   if (eof())
     return false;
 
+  int pos1 = pos_;
+
   if      (str_[pos_] == '\"') {
     if (! CStrUtil::skipDoubleQuotedString(str_, &pos_))
       return false;
@@ -216,6 +231,8 @@ skipString()
   else
     return false;
 
+  updateNL(pos1, pos_);
+
   return true;
 }
 
@@ -223,19 +240,23 @@ void
 CStrParse::
 skipToEnd()
 {
+  int pos1 = pos_;
+
   pos_ = len_;
+
+  updateNL(pos1, pos_);
 }
 
 bool
 CStrParse::
 readNonSpace(std::string &text)
 {
-  int pos = pos_;
-
   if (eof() || isspace(str_[pos_]))
     return false;
 
-  CStrUtil::skipNonSpace(str_, &pos_);
+  int pos = pos_;
+
+  skipNonSpace();
 
   text = str_.substr(pos, pos_ - pos);
 
@@ -250,6 +271,9 @@ readChar()
 
   assert(! eof());
 
+  if (str_[pos_] == '\n')
+    ++lineNum_;
+
   return str_[pos_++];
 }
 
@@ -261,6 +285,9 @@ readChar(char *c)
 
   if (eof())
     return false;
+
+  if (str_[pos_] == '\n')
+    ++lineNum_;
 
   *c = str_[pos_++];
 
@@ -276,6 +303,9 @@ unreadChar()
 
   --pos_;
 
+  if (str_[pos_] == '\n')
+    --lineNum_;
+
   return true;
 }
 
@@ -285,15 +315,22 @@ unreadString(const std::string &str)
 {
   uint len = str.size();
 
+  int pos1 = pos_;
+
   if (pos_ < len) {
     pos_ = 0;
 
+    updateNL(pos_, pos1, -1);
+
     return false;
   }
+  else {
+    pos_ -= len;
 
-  pos_ -= len;
+    updateNL(pos_, pos1, -1);
 
-  return true;
+    return true;
+  }
 }
 
 bool
@@ -302,7 +339,13 @@ readNumber(double &real, int &integer, bool &is_real)
 {
   autoSkipSpace();
 
-  return CStrUtil::readNumber(str_, &pos_, real, integer, is_real);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readNumber(str_, &pos_, real, integer, is_real);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -311,7 +354,13 @@ readInteger(int *integer)
 {
   autoSkipSpace();
 
-  return CStrUtil::readInteger(str_, &pos_, integer);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readInteger(str_, &pos_, integer);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -320,7 +369,13 @@ readBaseInteger(int base, int *integer)
 {
   autoSkipSpace();
 
-  return CStrUtil::readBaseInteger(str_, base, &pos_, integer);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readBaseInteger(str_, base, &pos_, integer);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -331,12 +386,15 @@ readReal(double *real)
 
   uint pos1 = pos_;
 
-  if (CStrUtil::readReal(str_, &pos1, real)) {
-    pos_ = pos1;
-    return true;
-  }
+  if (! CStrUtil::readReal(str_, &pos1, real))
+    return false;
 
-  return false;
+  pos_ = pos1;
+
+  updateNL(pos1, pos_);
+
+  return true;
+
 }
 
 bool
@@ -362,8 +420,12 @@ bool
 CStrParse::
 skipToChar(char c)
 {
-  while (pos_ < len_ && str_[pos_] != c)
+  while (pos_ < len_ && str_[pos_] != c) {
+    if (str_[pos_] == '\n')
+      ++lineNum_;
+
     ++pos_;
+  }
 
   if (eof())
     return false;
@@ -377,8 +439,12 @@ readToChar(char c, std::string &text)
 {
   text = "";
 
-  while (pos_ < len_ && str_[pos_] != c)
+  while (pos_ < len_ && str_[pos_] != c) {
+    if (str_[pos_] == '\n')
+      ++lineNum_;
+
     text += str_[pos_++];
+  }
 
   if (eof())
     return false;
@@ -399,7 +465,13 @@ readIdentifier(std::string &identifier)
 {
   autoSkipSpace();
 
-  return CStrUtil::readIdentifier(str_, &pos_, identifier);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readIdentifier(str_, &pos_, identifier);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -408,7 +480,13 @@ readRealFormat(std::string &real_format)
 {
   autoSkipSpace();
 
-  return CStrUtil::readRealFormat(str_, &pos_, real_format);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readRealFormat(str_, &pos_, real_format);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -417,7 +495,13 @@ readIntegerFormat(std::string &integer_format)
 {
   autoSkipSpace();
 
-  return CStrUtil::readIntegerFormat(str_, &pos_, integer_format);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readIntegerFormat(str_, &pos_, integer_format);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -426,7 +510,13 @@ readStringFormat(std::string &string_format)
 {
   autoSkipSpace();
 
-  return CStrUtil::readStringFormat(str_, &pos_, string_format);
+  int pos1 = pos_;
+
+  bool b = CStrUtil::readStringFormat(str_, &pos_, string_format);
+
+  updateNL(pos1, pos_);
+
+  return b;
 }
 
 bool
@@ -586,4 +676,24 @@ CStrParse::
 eof() const
 {
   return (pos_ >= len_);
+}
+
+void
+CStrParse::
+updateNL(int pos1, int pos2, int d)
+{
+  assert(pos1 <= pos2);
+
+  int n = 0;
+
+  for (int pos = pos1; pos < pos2; ++pos) {
+    if (str_[pos] == '\n')
+      ++n;
+  }
+
+  if (n) {
+    n *= d;
+
+    lineNum_ += d;
+  }
 }
