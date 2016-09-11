@@ -56,6 +56,8 @@ class CStrParse {
   virtual char readChar();
   virtual bool unreadChar();
 
+  virtual bool readUtf8Char(ulong *c);
+
   virtual bool unreadString(const std::string &str);
 
   virtual bool readNumber(double &real, int &integer, bool &is_real);
@@ -97,6 +99,8 @@ class CStrParse {
   virtual bool isWord(const std::string &str) const;
 
   virtual bool eof() const;
+
+  virtual bool neof(int n) const;
 
   virtual std::string stateStr() const {
     return getBefore() + getCharAt() + "\b_" + getAfter();

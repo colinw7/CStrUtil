@@ -1,5 +1,6 @@
 #include <CStrParse.h>
 #include <CStrUtil.h>
+#include <CUtf8.h>
 #include <cassert>
 
 CStrParse::
@@ -290,6 +291,28 @@ readChar(char *c)
     ++lineNum_;
 
   *c = str_[pos_++];
+
+  return true;
+}
+
+bool
+CStrParse::
+readUtf8Char(ulong *c)
+{
+  autoSkipSpace();
+
+  if (eof())
+    return false;
+
+  int pos1 = pos_;
+
+  *c = CUtf8::readNextChar(str_, pos1, len_);
+
+  uint pos2 = pos_;
+
+  pos_ = pos1;
+
+  updateNL(pos2, pos_);
 
   return true;
 }
@@ -676,6 +699,13 @@ CStrParse::
 eof() const
 {
   return (pos_ >= len_);
+}
+
+bool
+CStrParse::
+neof(int n) const
+{
+  return (pos_ + n >= len_);
 }
 
 void
