@@ -11,9 +11,8 @@ class CStrParse {
 
   virtual ~CStrParse() { }
 
-  void setAutoSkipSpace(bool auto_skip_space=true) {
-    auto_skip_space_ = auto_skip_space;
-  }
+  bool isAutoSkipSpace() const { return autoSkipSpace_; }
+  void setAutoSkipSpace(bool autoSkipSpace=true) { autoSkipSpace_ = autoSkipSpace; }
 
   virtual void setString(const std::string &str);
 
@@ -107,14 +106,11 @@ class CStrParse {
   }
 
  private:
-  void updateNL(int pos1, int pos2, int d=1);
-
- private:
   std::string            str_;
   uint                   pos_ { 0 };
   std::string::size_type len_ { 0 };
-  bool                   auto_skip_space_ { false };
-  int                    lineNum_ { 0 };
+  bool                   autoSkipSpace_ { false };
+  int                    lineNum_ { 1 };
 };
 
 #endif
