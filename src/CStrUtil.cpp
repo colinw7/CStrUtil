@@ -3868,11 +3868,25 @@ casecmp(const std::string &str1, const std::string &str2)
   return cmp(CStrUtil::toLower(str1), CStrUtil::toLower(str2));
 }
 
+int
+CStrUtil::
+casencmp(const std::string &str1, const std::string &str2, int n)
+{
+  return cmp(CStrUtil::toLower(str1.substr(0, n)), CStrUtil::toLower(str2.substr(0, n)));
+}
+
 std::string::size_type
 CStrUtil::
 casefind(const std::string &str1, const std::string &str2)
 {
   return CStrUtil::toLower(str1).find(CStrUtil::toLower(str2));
+}
+
+std::string::size_type
+CStrUtil::
+caserfind(const std::string &str1, const std::string &str2)
+{
+  return CStrUtil::toLower(str1).rfind(CStrUtil::toLower(str2));
 }
 
 bool

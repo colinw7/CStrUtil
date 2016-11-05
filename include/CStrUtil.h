@@ -317,8 +317,10 @@ namespace CStrUtil {
   int cmp(const std::string &str1, const std::string &str2);
 
   int casecmp(const std::string &str1, const std::string &str2);
+  int casencmp(const std::string &str1, const std::string &str2, int n);
 
   std::string::size_type casefind(const std::string &str1, const std::string &str2);
+  std::string::size_type caserfind(const std::string &str1, const std::string &str2);
 
   bool equal(char *str1, char *str2);
 
