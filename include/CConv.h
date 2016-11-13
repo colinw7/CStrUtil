@@ -2,6 +2,7 @@
 #define CCONV_H
 
 #include <sstream>
+#include <vector>
 
 namespace CConv {
   template<class T>
