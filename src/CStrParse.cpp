@@ -90,8 +90,8 @@ getBefore(uint pos) const
 {
   if      (pos < len_ && pos < pos_)
     return str_.substr(pos, pos_ - pos);
-  else if (pos < len_)
-    return str_.substr(pos);
+  else if (pos < len_ && pos > pos_)
+    return str_.substr(pos, pos - pos_);
   else
     return "";
 }

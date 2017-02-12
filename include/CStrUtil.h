@@ -468,7 +468,7 @@ class CStrWords {
   typedef std::vector<CStrWord>::iterator iterator;
   typedef std::vector<CStrWord>::const_iterator const_iterator;
 
-  CStrWords(const std::string &str) : str_(str), word_datas_() { }
+  explicit CStrWords(const std::string &str) : str_(str), word_datas_() { }
 
  ~CStrWords() { }
 

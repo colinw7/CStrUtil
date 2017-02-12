@@ -7,7 +7,7 @@
 
 class CStrParse {
  public:
-  CStrParse(const std::string &str="");
+  explicit CStrParse(const std::string &str="");
 
   virtual ~CStrParse() { }
 
