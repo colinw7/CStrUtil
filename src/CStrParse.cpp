@@ -550,6 +550,20 @@ isSpace() const
 
 bool
 CStrParse::
+isNewline() const
+{
+  if (eof()) return false;
+
+  if (str_[pos_] == '\n' || str_[pos_] == '\r')
+    return true;
+
+  // utf \u2028 (LS), \u2029 (PS)
+
+  return false;
+}
+
+bool
+CStrParse::
 isLower() const
 {
   autoSkipSpace();

@@ -77,6 +77,7 @@ class CStrParse {
   virtual bool readStringFormat(std::string &string_format);
 
   virtual bool isSpace() const;
+  virtual bool isNewline() const;
 
   virtual bool isAlpha() const;
   virtual bool isLower() const;
