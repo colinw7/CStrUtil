@@ -36,6 +36,7 @@ class CStrParse {
 
   virtual char getCharBefore(uint offset = 1) const;
   virtual char getCharAt    () const;
+  virtual char getCharAt    (int pos) const;
   virtual char getCharAfter (uint offset = 1) const;
 
   virtual void skipSpace();

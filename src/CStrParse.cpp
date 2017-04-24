@@ -32,8 +32,8 @@ void
 CStrParse::
 setPos(int pos)
 {
-  if (pos < 0 || pos > (int) len_)
-    return;
+  if (pos < 0        ) pos = 0;
+  if (pos > int(len_)) pos = len_;
 
   uint pos1 = pos;
 
@@ -123,6 +123,16 @@ getCharAt() const
   if (eof()) return '\0';
 
   return str_[pos_];
+}
+
+char
+CStrParse::
+getCharAt(int pos) const
+{
+  if (pos >= 0 && pos_ < len_)
+    return str_[pos];
+
+  return '\0';
 }
 
 char
