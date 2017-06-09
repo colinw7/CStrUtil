@@ -3592,23 +3592,43 @@ std::string
 CStrUtil::
 mostMatch(const std::vector<std::string> &strs)
 {
+  int ind = 0;
+
+  return mostMatch(strs, ind);
+}
+
+std::string
+CStrUtil::
+mostMatch(const std::vector<std::string> &strs, int &ind)
+{
+  ind = -1;
+
   uint num_strs = strs.size();
 
   if (num_strs == 0)
     return "";
 
-  if (num_strs == 1)
+  if (num_strs == 1) {
+    ind = 0;
+
     return strs[0];
+  }
 
   uint len = strs[0].size();
 
-  for (uint i = 0; i < len; i++)
+  for (uint i = 0; i < len; i++) {
     for (uint j = 1; j < num_strs; j++) {
       uint len1 = strs[j].size();
 
-      if (i >= len1 || strs[0][i] != strs[j][i])
+      if (i >= len1 || strs[0][i] != strs[j][i]) {
+        ind = j;
+
         return strs[0].substr(0, i);
+      }
     }
+  }
+
+  ind = 0;
 
   return strs[0];
 }

@@ -269,6 +269,7 @@ namespace CStrUtil {
             std::vector<std::string> &uniq_strs);
 
   std::string mostMatch(const std::vector<std::string> &strs);
+  std::string mostMatch(const std::vector<std::string> &strs, int &ind);
 
   void print(std::ostream &os, const std::vector<std::string> &strs);
 
