@@ -171,6 +171,88 @@ skipNonSpace()
   setPos(pos1);
 }
 
+bool
+CStrParse::
+skipBracedString()
+{
+  autoSkipSpace();
+
+  if (! isChar('{'))
+    return false;
+
+  skipChar();
+
+  int nbraces = 1;
+
+  while (! eof()) {
+    if      (isChar('{')) {
+      ++nbraces;
+    }
+    else if (isChar('}')) {
+      --nbraces;
+
+      if (nbraces == 0)
+        break;
+    }
+
+    skipChar();
+  }
+
+  if (isChar('}'))
+    skipChar();
+
+  return true;
+}
+
+bool
+CStrParse::
+readBracedString(std::string &text, bool includeBraces)
+{
+  text = "";
+
+  autoSkipSpace();
+
+  if (! isChar('{'))
+    return false;
+
+  if (includeBraces)
+    text += readChar();
+  else
+    skipChar();
+
+  int pos1 = getPos();
+
+  int nbraces = 1;
+
+  while (! eof()) {
+    if      (isChar('{')) {
+      ++nbraces;
+    }
+    else if (isChar('}')) {
+      --nbraces;
+
+      if (nbraces == 0)
+        break;
+    }
+
+    skipChar();
+  }
+
+  int pos2 = getPos();
+
+  text += getAt(pos1, pos2 - pos1);
+
+  if (! isChar('}'))
+    return false;
+
+  if (includeBraces)
+    text += readChar();
+  else
+    skipChar();
+
+  return true;
+}
+
 void
 CStrParse::
 autoSkipSpace() const

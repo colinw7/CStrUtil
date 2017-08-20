@@ -52,6 +52,9 @@ class CStrParse {
 
   virtual bool readNonSpace(std::string &text);
 
+  virtual bool skipBracedString();
+  virtual bool readBracedString(std::string &text, bool includeBraces=false);
+
   virtual bool readChar(char *c);
   virtual char readChar();
   virtual bool unreadChar();
