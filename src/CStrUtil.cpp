@@ -752,7 +752,6 @@ toReal(const std::string &str, double *real)
 
   if (c_str[i] == '\0') {
     error_msg_ = "Empty String";
-
     return false;
   }
 
@@ -771,7 +770,6 @@ toReal(const std::string &str, double *real)
 
     if (errno == ERANGE) {
       error_msg_ = "Out of Range";
-
       return false;
     }
   }
@@ -782,7 +780,6 @@ toReal(const std::string &str, double *real)
 
   if (errno == ERANGE) {
     error_msg_ = "Out of Range";
-
     return false;
   }
 #endif
@@ -792,7 +789,6 @@ toReal(const std::string &str, double *real)
 
   if (*p != '\0') {
     error_msg_ = "Trailing Characters";
-
     return false;
   }
 
