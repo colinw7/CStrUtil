@@ -198,8 +198,12 @@ skipBracedString()
     skipChar();
   }
 
-  if (isChar('}'))
-    skipChar();
+  if (eof())
+    return false;
+
+  assert(isChar('}'));
+
+  skipChar();
 
   return true;
 }
@@ -242,8 +246,10 @@ readBracedString(std::string &text, bool includeBraces)
 
   text += getAt(pos1, pos2 - pos1);
 
-  if (! isChar('}'))
+  if (eof())
     return false;
+
+  assert(isChar('}'));
 
   if (includeBraces)
     text += readChar();

@@ -2313,8 +2313,7 @@ toTokens(const std::string &str, const std::string &separators)
 
 void
 CStrUtil::
-addTokens(const std::string &str, std::vector<std::string> &words,
-          const std::string &separators)
+addTokens(const std::string &str, std::vector<std::string> &words, const std::string &separators)
 {
   if (separators.size() == 0) {
     addWords(str, words);
@@ -4562,9 +4561,8 @@ vstrprintf(const char *format, va_list *vargs)
 
 bool
 CStrUtil::
-readFormat(const std::string &str, uint *pos, std::string &format,
-           int *field_width, int *precision, char *length_modifier,
-           char *format_code, int *flags)
+readFormat(const std::string &str, uint *pos, std::string &format, int *field_width,
+           int *precision, char *length_modifier, char *format_code, int *flags)
 {
   uint save_pos = *pos;
 
@@ -4656,8 +4654,7 @@ readFormat(const std::string &str, uint *pos, std::string &format,
 
   /* optional length modifier */
 
-  if (*pos < len &&
-      (str[*pos] == 'h' || str[*pos] == 'l' ||  str[*pos] == 'L')) {
+  if (*pos < len && (str[*pos] == 'h' || str[*pos] == 'l' || str[*pos] == 'L')) {
     *length_modifier = str[(*pos)++];
 
     format += *length_modifier;
@@ -4674,7 +4671,7 @@ readFormat(const std::string &str, uint *pos, std::string &format,
 
   *format_code = str[(*pos)++];
 
-  format += format_code;
+  format += *format_code;
 
   return true;
 }
