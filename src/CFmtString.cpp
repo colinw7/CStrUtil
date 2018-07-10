@@ -1,7 +1,7 @@
 #include <CFmtString.h>
 
 CFmtString::
-CFmtString(const std::string &str, int width, CStrFmtAlignType align) :
+CFmtString(const std::string &str, int width, CStrFmt::AlignType align) :
  str_(str), width_(width), align_(align)
 {
   format();
@@ -38,7 +38,7 @@ setWidth(int width)
 
 void
 CFmtString::
-setAlign(CStrFmtAlignType align)
+setAlign(CStrFmt::AlignType align)
 {
   if (align == align_)
     return;

@@ -6,12 +6,12 @@
 class CFmtString {
  public:
   CFmtString(const std::string &str, int width=80,
-             CStrFmtAlignType align=CSTR_FMT_ALIGN_LEFT);
+             CStrFmt::AlignType align=CStrFmt::AlignType::LEFT);
  ~CFmtString();
 
   void setString(const std::string &str);
   void setWidth(int width);
-  void setAlign(CStrFmtAlignType align);
+  void setAlign(CStrFmt::AlignType align);
 
   int getNumLines() const { return lines_.size(); }
 
@@ -23,7 +23,7 @@ class CFmtString {
  private:
   std::string              str_;
   int                      width_;
-  CStrFmtAlignType         align_;
+  CStrFmt::AlignType       align_;
   std::vector<std::string> lines_;
 };
 
