@@ -106,6 +106,8 @@ class CStrParse {
 
   virtual bool neof(int n) const;
 
+  virtual void setEof();
+
   virtual std::string stateStr() const {
     return getBefore() + getCharAt() + "\b_" + getAfter();
   }

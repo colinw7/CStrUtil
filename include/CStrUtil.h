@@ -124,8 +124,7 @@ namespace CStrUtil {
   bool isBaseChar(int c, uint base, int *value = NULL);
 
   bool isCComment(const std::string &str, uint pos);
-  bool readCComment(const std::string &str, uint *pos,
-                    bool *in_comment, std::string &comment);
+  bool readCComment(const std::string &str, uint *pos, bool *in_comment, std::string &comment);
 
   bool isCNumber(const std::string &str, uint pos);
   bool readCNumber(const std::string &str, uint *pos, std::string &number);
@@ -136,8 +135,7 @@ namespace CStrUtil {
   bool isCString(const std::string &str, uint pos);
   bool readCString(const std::string &str, uint *pos, std::string &number);
 
-  std::string stripSpaces(const std::string &str,
-                          bool front=true, bool back=true);
+  std::string stripSpaces(const std::string &str, bool front=true, bool back=true);
 
   char *stripSpaces(char *str, bool front=true, bool back=true);
 
@@ -164,8 +162,7 @@ namespace CStrUtil {
   std::string replace(const std::string &str, const std::string &old_str,
                       const std::string &new_str);
 
-  std::string translate(const std::string &str,
-                        const std::string &old_chars,
+  std::string translate(const std::string &str, const std::string &old_chars,
                         const std::string &new_chars, bool remove=false);
 
   CStrWords toWords(const std::string &str, CWordDef *def);
@@ -188,8 +185,7 @@ namespace CStrUtil {
   void addFields(const std::string &str, std::vector<std::string> &words,
                  const std::string &splitters="", bool skipEmpty=false);
 
-  CStrWords toTokens(const std::string &str,
-                     const std::string &splitters="");
+  CStrWords toTokens(const std::string &str, const std::string &splitters="");
 
   void addTokens(const std::string &str, std::vector<std::string> &words,
                  const std::string &splitters="");
@@ -213,10 +209,8 @@ namespace CStrUtil {
   bool readInteger(const std::string &str, uint *pos, int *integer);
   bool readInteger(const char *str, uint *pos, int *integer);
 
-  bool readBaseInteger(const std::string &str, uint base,
-                       uint *pos, int *integer);
-  bool readBaseInteger(const char *str, uint base,
-                       uint *pos, int *integer);
+  bool readBaseInteger(const std::string &str, uint base, uint *pos, int *integer);
+  bool readBaseInteger(const char *str, uint base, uint *pos, int *integer);
 
   bool skipInteger(const std::string &str, uint *pos);
   bool skipInteger(const char *str, uint *pos);
@@ -233,13 +227,11 @@ namespace CStrUtil {
 
   bool isIdentifier(const std::string &str);
   bool isIdentifier(const std::string &str, uint pos);
-  bool readIdentifier(const std::string &str, uint *pos,
-                      std::string &identifier);
+  bool readIdentifier(const std::string &str, uint *pos, std::string &identifier);
   bool skipIdentifier(const std::string &str, uint *pos);
 
   bool isCIdentifier(const std::string &str, uint pos);
-  bool readCIdentifier(const std::string &str, uint *pos,
-                              std::string &identifier);
+  bool readCIdentifier(const std::string &str, uint *pos, std::string &identifier);
 
   bool isCOperator(const std::string &str, uint pos);
   bool readCOperator(const std::string &str, uint *pos, std::string &opstr);
@@ -265,8 +257,10 @@ namespace CStrUtil {
   std::string insertEscapeCodes(const std::string &str);
 
   void sort(std::vector<std::string> &strs);
-  void uniq(const std::vector<std::string> &strs,
-            std::vector<std::string> &uniq_strs);
+
+  void sortNum(std::vector<std::string> &strs);
+
+  void uniq(const std::vector<std::string> &strs, std::vector<std::string> &uniq_strs);
 
   std::string mostMatch(const std::vector<std::string> &strs);
   std::string mostMatch(const std::vector<std::string> &strs, int &ind);
@@ -286,14 +280,11 @@ namespace CStrUtil {
   void        vsprintf(std::string &str, const char *format, va_list *vargs);
   std::string vstrprintf(const char *format, va_list *vargs);
 
-  bool readFormat(const std::string &str, uint *pos, std::string &format,
-                  int *field_width, int *precision,
-                  char *length_modifier, char *format_code, int *flags);
+  bool readFormat(const std::string &str, uint *pos, std::string &format, int *field_width,
+                  int *precision, char *length_modifier, char *format_code, int *flags);
   bool readRealFormat(const std::string &str, uint *pos, std::string &format);
-  bool readIntegerFormat(const std::string &str, uint *pos,
-                         std::string &format);
-  bool readStringFormat(const std::string &str, uint *pos,
-                        std::string &format);
+  bool readIntegerFormat(const std::string &str, uint *pos, std::string &format);
+  bool readStringFormat(const std::string &str, uint *pos, std::string &format);
 
   char *strdup(const char *str);
   char *strdup(const std::string &str);
@@ -317,16 +308,18 @@ namespace CStrUtil {
 
   int cmp(const std::string &str1, const std::string &str2);
 
+  int ccasecmp(const char *str1, const char *str2);
+  int ccasencmp(const char *str1, const char *str2, size_t n);
+
   int casecmp(const std::string &str1, const std::string &str2);
-  int casencmp(const std::string &str1, const std::string &str2, int n);
+  int casencmp(const std::string &str1, const std::string &str2, size_t n);
 
   std::string::size_type casefind(const std::string &str1, const std::string &str2);
   std::string::size_type caserfind(const std::string &str1, const std::string &str2);
 
   bool equal(char *str1, char *str2);
 
-  std::string concatFileNames(const std::string &lhs,
-                              const std::string &rhs);
+  std::string concatFileNames(const std::string &lhs, const std::string &rhs);
 
   uint maxLen(std::vector<std::string> &words);
 
@@ -340,11 +333,9 @@ namespace CStrUtil {
 
   void stringExpand(const std::string &str, std::vector<std::string> &ostrs);
 
-  void stringExpand1(const std::vector<std::string> &istrs,
-                     std::vector<std::string> &ostrs);
+  void stringExpand1(const std::vector<std::string> &istrs, std::vector<std::string> &ostrs);
   void stringExpand2(const std::string &lhs, const std::string &rhs,
-                     const std::string &chars,
-                     std::vector<std::string> &strs);
+                     const std::string &chars, std::vector<std::string> &strs);
 
   std::string caseSepToUnderscoreSep(const std::string &str);
   std::string underscoreSepToCaseSep(const std::string &str);

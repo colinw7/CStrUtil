@@ -815,3 +815,10 @@ neof(int n) const
 {
   return (pos_ + n >= len_);
 }
+
+void
+CStrParse::
+setEof()
+{
+  pos_ = len_;
+}

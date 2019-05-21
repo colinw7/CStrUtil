@@ -3550,11 +3550,67 @@ insertEscapeCodes(const std::string &str)
   return str1;
 }
 
+class CStrNumCmpFunctor {
+ public:
+  bool operator()(const std::string &str1, const std::string &str2) {
+    int i1   = 0;
+    int i2   = 0;
+    int len1 = str1.size();
+    int len2 = str2.size();
+
+    while (i1 < len1 && i2 < len2) {
+      char c1 = str1[i1++];
+      char c2 = str2[i2++];
+
+      if      (isdigit(c1) && isdigit(c2)) {
+        std::string nstr1, nstr2;
+
+        nstr1 += c1;
+
+        while (i1 < len1 && isdigit(c1)) {
+          nstr1 += str1[i1++];
+
+          c1 = str1[i1];
+        }
+
+        nstr2 += c2;
+
+        while (i2 < len2 && isdigit(c2)) {
+          nstr2 += str2[i2++];
+
+          c2 = str2[i2];
+        }
+
+        int n1 = std::stoi(nstr1);
+        int n2 = std::stoi(nstr2);
+
+        if (n1 != n2)
+          return (n1 < n2);
+      }
+      else if (c1 != c2) {
+        return (c1 < c2);
+      }
+    }
+
+    if (i1 == len1 && i2 == len2)
+      return false;
+
+    return (i1 >= len1);
+  }
+};
+
 void
 CStrUtil::
 sort(std::vector<std::string> &strs)
 {
   std::sort(strs.begin(), strs.end(), CStrCmpFunctor());
+}
+
+void
+CStrUtil::
+sortNum(std::vector<std::string> &strs)
+{
+  std::sort(strs.begin(), strs.end(), CStrNumCmpFunctor());
 }
 
 void
@@ -3878,6 +3934,20 @@ cmp(const std::string &str1, const std::string &str2)
 
 int
 CStrUtil::
+ccasecmp(const char *str1, const char *str2)
+{
+  return casecmp(str1, str2);
+}
+
+int
+CStrUtil::
+ccasencmp(const char *str1, const char *str2, size_t n)
+{
+  return casencmp(str1, str2, n);
+}
+
+int
+CStrUtil::
 casecmp(const std::string &str1, const std::string &str2)
 {
   return cmp(CStrUtil::toLower(str1), CStrUtil::toLower(str2));
@@ -3885,7 +3955,7 @@ casecmp(const std::string &str1, const std::string &str2)
 
 int
 CStrUtil::
-casencmp(const std::string &str1, const std::string &str2, int n)
+casencmp(const std::string &str1, const std::string &str2, size_t n)
 {
   return cmp(CStrUtil::toLower(str1.substr(0, n)), CStrUtil::toLower(str2.substr(0, n)));
 }
