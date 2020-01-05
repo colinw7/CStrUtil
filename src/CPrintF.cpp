@@ -60,7 +60,7 @@ format() const
         int format_qualifier = '\0';
 
         while (i < format_len && strchr("hlL", format_[i]) != NULL) {
-          if      (format_qualifier == 'l' && format_qualifier == 'l')
+          if      (format_[i] == 'l' && format_qualifier == 'l')
             format_qualifier = 'j';
           else if (format_qualifier == '\0')
             format_qualifier = format_[i];

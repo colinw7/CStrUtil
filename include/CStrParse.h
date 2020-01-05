@@ -99,6 +99,7 @@ class CStrParse {
   virtual bool isNextChar(char c) const;
 
   virtual bool isString(const std::string &str) const;
+  virtual bool isStringEnd(const std::string &str) const;
   virtual bool isOneOf(const std::string &str) const;
   virtual bool isWord(const std::string &str) const;
 

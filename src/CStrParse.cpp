@@ -776,6 +776,22 @@ isString(const std::string &str) const
 
 bool
 CStrParse::
+isStringEnd(const std::string &str) const
+{
+  int len = str.size();
+
+  if (pos_ + len != len_)
+    return false;
+
+  for (int i = 0; i < len; ++i)
+    if (str_[pos_ + i] != str[i])
+      return false;
+
+  return true;
+}
+
+bool
+CStrParse::
 isOneOf(const std::string &str) const
 {
   autoSkipSpace();
