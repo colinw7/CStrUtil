@@ -207,9 +207,11 @@ namespace CStrUtil {
   bool skipBackQuotedString  (const std::string &str, uint *pos);
 
   bool readInteger(const std::string &str, uint *pos, int *integer);
+  bool readInteger(const std::string &str, uint *pos, long *integer);
   bool readInteger(const char *str, uint *pos, int *integer);
 
   bool readBaseInteger(const std::string &str, uint base, uint *pos, int *integer);
+  bool readBaseInteger(const std::string &str, uint base, uint *pos, long *integer);
   bool readBaseInteger(const char *str, uint base, uint *pos, int *integer);
 
   bool skipInteger(const std::string &str, uint *pos);

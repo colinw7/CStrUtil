@@ -2348,6 +2348,20 @@ bool
 CStrUtil::
 readInteger(const std::string &str, uint *pos, int *integer)
 {
+  long i;
+
+  if (! readInteger(str, pos, &i))
+    return false;
+
+  *integer = i;
+
+  return true;
+}
+
+bool
+CStrUtil::
+readInteger(const std::string &str, uint *pos, long *integer)
+{
 //skipSpace(str, pos);
 
   //------
@@ -2401,6 +2415,20 @@ readInteger(const char *str, uint *pos, int *integer)
 bool
 CStrUtil::
 readBaseInteger(const std::string &str, uint base, uint *pos, int *integer)
+{
+  long i = 0;
+
+  if (! readBaseInteger(str, base, pos, &i))
+    return false;
+
+  *integer = i;
+
+  return true;
+}
+
+bool
+CStrUtil::
+readBaseInteger(const std::string &str, uint base, uint *pos, long *integer)
 {
 //skipSpace(str, pos);
 

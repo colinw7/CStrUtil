@@ -485,7 +485,37 @@ readInteger(int *integer)
 
 bool
 CStrParse::
+readInteger(long *integer)
+{
+  autoSkipSpace();
+
+  uint pos1 = pos_;
+
+  bool b = CStrUtil::readInteger(str_, &pos1, integer);
+
+  setPos(pos1);
+
+  return b;
+}
+
+bool
+CStrParse::
 readBaseInteger(int base, int *integer)
+{
+  autoSkipSpace();
+
+  uint pos1 = pos_;
+
+  bool b = CStrUtil::readBaseInteger(str_, base, &pos1, integer);
+
+  setPos(pos1);
+
+  return b;
+}
+
+bool
+CStrParse::
+readBaseInteger(int base, long *integer)
 {
   autoSkipSpace();
 

@@ -66,7 +66,9 @@ class CStrParse {
   virtual bool readNumber(double &real, int &integer, bool &is_real);
 
   virtual bool readInteger(int *integer);
+  virtual bool readInteger(long *integer);
   virtual bool readBaseInteger(int base, int *integer);
+  virtual bool readBaseInteger(int base, long *integer);
   virtual bool readReal(double *real);
   virtual bool readString(std::string &str, bool strip_quotes=false);
 
