@@ -10,7 +10,7 @@ class CStrFmtFormat {
 
  private:
   void addWord();
-  bool isSplitter(const std::string &str, int pos);
+  bool isSplitter(const std::string &sstr, int pos);
 
  private:
   std::string              str;
@@ -226,33 +226,33 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
       int *pads = new int [num_words - 1];
 
-      for (int i = 0; i < num_words - 1; i++)
-        pads[i] = 0;
+      for (int ii = 0; ii < num_words - 1; ii++)
+        pads[ii] = 0;
 
       if (direction == 0) {
-        int i = 0;
+        int ii = 0;
 
         while (num_pads > 0) {
-          pads[i++]++;
+          pads[ii++]++;
 
           num_pads--;
 
-          if (i >= num_words - 1)
-            i = 0;
+          if (ii >= num_words - 1)
+            ii = 0;
         }
 
         direction = 1;
       }
       else {
-        int i = num_words - 2;
+        int ii = num_words - 2;
 
         while (num_pads > 0) {
-          pads[i--]++;
+          pads[ii--]++;
 
           num_pads--;
 
-          if (i < 0)
-            i = num_words - 2;
+          if (ii < 0)
+            ii = num_words - 2;
         }
 
         direction = 0;
@@ -262,14 +262,14 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
       num_words = 0;
 
-      int i = 0;
+      int ii = 0;
 
-      while (i < strLen) {
-        if (isspace(str1[i])) {
-          i++;
+      while (ii < strLen) {
+        if (isspace(str1[ii])) {
+          ii++;
 
-          while (i < strLen && isspace(str1[i]))
-            i++;
+          while (ii < strLen && isspace(str1[ii]))
+            ii++;
 
           for (int j = 0; j < pads[num_words]; j++) {
             str2 += ' ';
@@ -280,7 +280,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
           num_words++;
         }
         else {
-          str2 += str1[i++];
+          str2 += str1[ii++];
 
           ++str2_len;
         }
@@ -353,11 +353,11 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
 bool
 CStrFmtFormat::
-isSplitter(const std::string &str, int pos)
+isSplitter(const std::string &sstr, int pos)
 {
   /* Space is a Splitter ... */
 
-  if (isspace(str[pos]))
+  if (isspace(sstr[pos]))
     return true;
 
   //------
@@ -365,9 +365,9 @@ isSplitter(const std::string &str, int pos)
   /* Punctuation Characters followed by an End of String or
      a Space are Splitters ... */
 
-  int strLen = str.size();
+  int strLen = sstr.size();
 
-  if (ispunct(str[pos]) && (pos == strLen - 1 || isspace(str[pos + 1])))
+  if (ispunct(sstr[pos]) && (pos == strLen - 1 || isspace(sstr[pos + 1])))
     return true;
 
   //------
@@ -376,7 +376,7 @@ isSplitter(const std::string &str, int pos)
      followed by an End of String or a non-Punctuation Character
      is a Splitter ... */
 
-  if (strchr(",:;?!", str[pos]) != NULL && (pos == strLen - 1 || ! ispunct(str[pos + 1])))
+  if (strchr(",:;?!", sstr[pos]) != NULL && (pos == strLen - 1 || ! ispunct(sstr[pos + 1])))
     return true;
 
   //------

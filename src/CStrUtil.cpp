@@ -3221,31 +3221,16 @@ replaceEscapeCodes(const std::string &str)
     ++i;
 
     switch (str[i]) {
-      case 'a':
-        str1 += '\a';
-        break;
-      case 'b':
-        str1 += '\b';
-        break;
-      case 'e':
-        str1 += '\033';
-        break;
-      case 'f':
-        str1 += '\f';
-        break;
-      case 'n':
-        str1 += '\n';
-        break;
-      case 'r':
-        str1 += '\r';
-        break;
-      case 't':
-        str1 += '\t';
-        break;
-      case 'v':
-        str1 += '\v';
-        break;
-      case 'x':
+      case 'a': str1 += '\a'  ; break;
+      case 'b': str1 += '\b'  ; break;
+      case 'e': str1 += '\033'; break;
+      case 'f': str1 += '\f'  ; break;
+      case 'n': str1 += '\n'  ; break;
+      case 'r': str1 += '\r'  ; break;
+      case 't': str1 += '\t'  ; break;
+      case 'v': str1 += '\v'  ; break;
+
+      case 'x': {
         if (i < len - 1 && ::isxdigit(str[i + 1])) {
           int hex_value = 0;
 
@@ -3279,10 +3264,11 @@ replaceEscapeCodes(const std::string &str)
         }
 
         break;
-      case '\\':
-        str1 += '\\';
-        break;
-      case '0':
+     }
+
+      case '\\': str1 += '\\'; break;
+
+      case '0': {
         if (i < len - 1 && CStrUtil::isodigit(str[i + 1])) {
           int oct_value = 0;
 
@@ -3314,10 +3300,9 @@ replaceEscapeCodes(const std::string &str)
         }
 
         break;
-      default:
-        str1 += '\\';
-        str1 += str[i++];
-        break;
+      }
+
+      default: str1 += '\\'; str1 += str[i++]; break;
     }
 
     ++i;
@@ -3345,31 +3330,16 @@ encodeEscapeChar(const std::string &str, char *c)
   ++pos;
 
   switch (str[pos]) {
-    case 'a':
-      *c = '\a';
-      break;
-    case 'b':
-      *c = '\b';
-      break;
-    case 'e':
-      *c = '\033';
-      break;
-    case 'f':
-      *c = '\f';
-      break;
-    case 'n':
-      *c = '\n';
-      break;
-    case 'r':
-      *c = '\r';
-      break;
-    case 't':
-      *c = '\t';
-      break;
-    case 'v':
-      *c = '\v';
-      break;
-    case 'x':
+    case 'a': *c = '\a'  ; break;
+    case 'b': *c = '\b'  ; break;
+    case 'e': *c = '\033'; break;
+    case 'f': *c = '\f'  ; break;
+    case 'n': *c = '\n'  ; break;
+    case 'r': *c = '\r'  ; break;
+    case 't': *c = '\t'  ; break;
+    case 'v': *c = '\v'  ; break;
+
+    case 'x': {
       if (pos < len - 1 && ::isxdigit(str[pos + 1])) {
         int hex_value = 0;
 
@@ -3401,10 +3371,11 @@ encodeEscapeChar(const std::string &str, char *c)
         return false;
 
       break;
-    case '\\':
-      *c = '\\';
-      break;
-    case '0':
+    }
+
+    case '\\': *c = '\\'; break;
+
+    case '0': {
       if (pos < len - 1 && CStrUtil::isodigit(str[pos + 1])) {
         int oct_value = 0;
 
@@ -3434,8 +3405,9 @@ encodeEscapeChar(const std::string &str, char *c)
         *c = '\0';
 
       break;
-    default:
-      return false;
+    }
+
+    default: return false;
   }
 
   ++pos;
@@ -3531,36 +3503,17 @@ insertEscapeCodes(const std::string &str)
     str1 += '\\';
 
     switch (c) {
-      case '\a':
-        str1 += 'a';
-        break;
-      case '\b':
-        str1 += 'b';
-        break;
-      case '\f':
-        str1 += 'f';
-        break;
-      case '\n':
-        str1 += 'n';
-        break;
-      case '\r':
-        str1 += 'r';
-        break;
-      case '\t':
-        str1 += 't';
-        break;
-      case '\v':
-        str1 += 'v';
-        break;
-      case '\033':
-        str1 += 'e';
-        break;
-      case '\"':
-        str1 += '\"';
-        break;
-      case '\'':
-        str1 += '\'';
-        break;
+      case '\a'  : str1 += 'a' ; break;
+      case '\b'  : str1 += 'b' ; break;
+      case '\f'  : str1 += 'f' ; break;
+      case '\n'  : str1 += 'n' ; break;
+      case '\r'  : str1 += 'r' ; break;
+      case '\t'  : str1 += 't' ; break;
+      case '\v'  : str1 += 'v' ; break;
+      case '\033': str1 += 'e' ; break;
+      case '\"'  : str1 += '\"'; break;
+      case '\''  : str1 += '\''; break;
+
       default: {
         int digit1 = c/64;
         int digit2 = (c - digit1*64)/8;
