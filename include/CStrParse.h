@@ -28,11 +28,20 @@ class CStrParse {
 
   int lineNum() const { return lineNum_; }
 
-  virtual std::string getAt    () const;
-  virtual std::string getAt    (uint pos) const;
-  virtual std::string getAt    (uint pos, uint len) const;
+  // get string from current position to end
+  virtual std::string getAt() const;
+
+  // get string from position to end
+  virtual std::string getAt(uint pos) const;
+
+  // get string from position of specified number of characters
+  virtual std::string getAt(uint pos, uint len) const;
+
+  // get string from specified pos to current pos
   virtual std::string getBefore(uint pos=0) const;
-  virtual std::string getAfter () const;
+
+  // get string after specified pos
+  virtual std::string getAfter() const;
 
   virtual char getCharBefore(uint offset = 1) const;
   virtual char getCharAt    () const;
