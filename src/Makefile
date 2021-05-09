@@ -21,6 +21,7 @@ CPrintF.cpp \
 CFmtString.cpp \
 CStrParse.cpp \
 CStrFmt.cpp \
+CScanF.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
