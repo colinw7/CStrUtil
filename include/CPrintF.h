@@ -23,7 +23,7 @@ class CPrintF {
     PRECISION_AS_VALUE   = (1<<6)
   };
 
-  CPrintF(const std::string &format="");
+  explicit CPrintF(const std::string &format="");
 
   virtual ~CPrintF() { }
 
