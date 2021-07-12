@@ -15,10 +15,10 @@
 #include <algorithm>
 #include <iostream>
 
-static CWordDef    word_def_;
-static std::string base_chars_ = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static std::string error_msg_;
-static bool        hex_upper_;
+static CWordDef    s_word_def;
+static std::string s_base_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static std::string s_error_msg;
+static bool        s_hex_upper;
 
 std::string
 CStrUtil::
@@ -298,7 +298,7 @@ void
 CStrUtil::
 setHexUpper(bool upper)
 {
-  hex_upper_ = upper;
+  s_hex_upper = upper;
 }
 
 std::string
@@ -308,7 +308,7 @@ toHexString(uint integer, uint width)
   static char format[16];
   static char buffer[64];
 
-  if (hex_upper_)
+  if (s_hex_upper)
     ::sprintf(format, "%%0%dX", width);
   else
     ::sprintf(format, "%%0%dx", width);
@@ -339,6 +339,36 @@ toOctString(int integer)
     str = (char) (i + '0') + str;
 
   return str;
+}
+
+std::string
+CStrUtil::
+toBaseString(int integer, uint base)
+{
+  if (base < 2 || base > s_base_chars.size()) {
+    CTHROW("Unsupported Base " + CStrUtil::toString(base));
+    return "";
+  }
+
+  bool negative = (integer < 0);
+
+  std::string str;
+
+  uint i = std::abs(integer);
+
+  while (i >= base) {
+    uint i1 = i / base;
+    uint i2 = i % base;
+
+    str = s_base_chars[i2] + str;
+
+    i = i1;
+  }
+
+  if (i > 0 || str == "")
+    str = s_base_chars[i] + str;
+
+  return (negative ? "-" + str : str);
 }
 
 std::string
@@ -410,7 +440,7 @@ toBool(const std::string &str)
   bool value;
 
   if (! toBool(str, &value)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return false;
   }
 
@@ -432,7 +462,7 @@ toBool(const std::string &str, bool *value)
            CStrUtil::casecmp(str, "0"    ) == 0)
     *value = false;
   else {
-    error_msg_ = "Invalid Boolean String";
+    s_error_msg = "Invalid Boolean String";
     return false;
   }
 
@@ -478,7 +508,7 @@ toInteger(const std::string &str)
   long integer;
 
   if (! toInteger(str, &integer)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return 0;
   }
 
@@ -542,7 +572,7 @@ toInteger(const std::string &str, long *integer)
     ++i;
 
   if (c_str[i] == '\0') {
-    error_msg_ = "Empty String";
+    s_error_msg = "Empty String";
     return false;
   }
 
@@ -553,7 +583,7 @@ toInteger(const std::string &str, long *integer)
   *integer = strtol(&c_str[i], (char **) &p, 10);
 
   if (errno == ERANGE) {
-    error_msg_ = "Out of Range";
+    s_error_msg = "Out of Range";
     return false;
   }
 
@@ -561,7 +591,7 @@ toInteger(const std::string &str, long *integer)
     ++p;
 
   if (*p != '\0') {
-    error_msg_ = "Trailing Characters";
+    s_error_msg = "Trailing Characters";
     return false;
   }
 
@@ -572,7 +602,7 @@ bool
 CStrUtil::
 isBaseInteger(const std::string &str, uint base)
 {
-  if (base < 2 || base > base_chars_.size()) {
+  if (base < 2 || base > s_base_chars.size()) {
     CTHROW("Unsupported Base " + CStrUtil::toString(base));
     return false;
   }
@@ -599,7 +629,7 @@ toBaseInteger(const std::string &str, uint base)
   long integer;
 
   if (! toBaseInteger(str, base, &integer)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return 0;
   }
 
@@ -613,7 +643,7 @@ toBaseInteger(const std::string &str, uint base, int *integer)
   long integer1;
 
   if (! toBaseInteger(str, base, &integer1)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return false;
   }
 
@@ -629,7 +659,7 @@ toBaseInteger(const std::string &str, uint base, uint *integer)
   long integer1;
 
   if (! toBaseInteger(str, base, &integer1)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return false;
   }
 
@@ -644,8 +674,8 @@ toBaseInteger(const std::string &str, uint base, long *integer)
 {
   *integer = 0;
 
-  if (base < 2 || base > base_chars_.size()) {
-    error_msg_ = "Unsupported Base " + CStrUtil::toString(base);
+  if (base < 2 || base > s_base_chars.size()) {
+    s_error_msg = "Unsupported Base " + CStrUtil::toString(base);
     return false;
   }
 
@@ -663,7 +693,7 @@ toBaseInteger(const std::string &str, uint base, long *integer)
     long integer1 = base*(*integer) + value;
 
     if (long((integer1 - (long) value)/base) != *integer) {
-      error_msg_ = "Overflow.";
+      s_error_msg = "Overflow.";
       return false;
     }
 
@@ -673,7 +703,7 @@ toBaseInteger(const std::string &str, uint base, long *integer)
   }
 
   if (*integer > INT_MAX || *integer < INT_MIN) {
-    error_msg_ = "Overflow.";
+    s_error_msg = "Overflow.";
     return false;
   }
 
@@ -732,7 +762,7 @@ toReal(const std::string &str)
   double real;
 
   if (! toReal(str, &real)) {
-    CTHROW(error_msg_);
+    CTHROW(s_error_msg);
     return 0.0;
   }
 
@@ -751,7 +781,7 @@ toReal(const std::string &str, double *real)
     ++i;
 
   if (c_str[i] == '\0') {
-    error_msg_ = "Empty String";
+    s_error_msg = "Empty String";
     return false;
   }
 
@@ -769,7 +799,7 @@ toReal(const std::string &str, double *real)
     *real = strtod(&c_str[i], (char **) &p);
 
     if (errno == ERANGE) {
-      error_msg_ = "Out of Range";
+      s_error_msg = "Out of Range";
       return false;
     }
   }
@@ -779,7 +809,7 @@ toReal(const std::string &str, double *real)
   *real = strtod(&c_str[i], (char **) &p);
 
   if (errno == ERANGE) {
-    error_msg_ = "Out of Range";
+    s_error_msg = "Out of Range";
     return false;
   }
 #endif
@@ -788,7 +818,7 @@ toReal(const std::string &str, double *real)
     ++p;
 
   if (*p != '\0') {
-    error_msg_ = "Trailing Characters";
+    s_error_msg = "Trailing Characters";
     return false;
   }
 
@@ -799,7 +829,7 @@ bool
 CStrUtil::
 isBaseChar(int c, uint base, int *value)
 {
-  if (base < 2 || base > base_chars_.size()) {
+  if (base < 2 || base > s_base_chars.size()) {
     CTHROW("Unsupported Base " + CStrUtil::toString(base));
     return false;
   }
@@ -809,11 +839,11 @@ isBaseChar(int c, uint base, int *value)
   if (::islower(c1))
     c1 = toupper(c1);
 
-  std::string::size_type pos = base_chars_.find((char) c1);
+  auto pos = s_base_chars.find((char) c1);
 
   if (pos == std::string::npos || pos >= base) {
-    error_msg_ = std::string("Invalid Character ") + char(c) +
-                 " for Base " + CStrUtil::toString(base);
+    s_error_msg = std::string("Invalid Character ") + char(c) +
+                   " for Base " + CStrUtil::toString(base);
     return false;
   }
 
@@ -1630,7 +1660,7 @@ CStrUtil::
 toWords(const std::string &str, CWordDef *def)
 {
   if (! def)
-    def = &word_def_;
+    def = &s_word_def;
 
   CStrWords words(str);
 
@@ -1667,7 +1697,7 @@ CStrUtil::
 addWords(const std::string &str, std::vector<std::string> &words, CWordDef *def)
 {
   if (! def)
-    def = &word_def_;
+    def = &s_word_def;
 
   uint len = str.size();
 
@@ -1758,7 +1788,7 @@ CStrUtil::
 readWord(const std::string &str, uint *pos, CWordDef *def)
 {
   if (! def)
-    def = &word_def_;
+    def = &s_word_def;
 
   uint len = str.size();
 

@@ -98,6 +98,8 @@ namespace CStrUtil {
   std::string toOctString(int integer);
   std::string toOctStringInWidth(int integer, uint width=4);
 
+  std::string toBaseString(int integer, uint base);
+
   std::string toBitString(int c);
 
   bool isBool(const std::string &str);
