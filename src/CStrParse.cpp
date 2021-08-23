@@ -17,6 +17,9 @@ setString(const std::string &str)
   pos_     = 0;
   len_     = str_.size();
   lineNum_ = 1;
+  linePos_ = 0;
+
+  lineLen_.clear();
 }
 
 void
@@ -39,8 +42,13 @@ setPos(int pos)
 
   if      (pos1 > pos_) {
     while (pos_ < pos1) {
-      if (str_[pos_] == '\n')
-        ++lineNum_;
+      if (str_[pos_] == '\n') {
+        lineLen_[lineNum_++] = linePos_;
+
+        linePos_ = 0;
+      }
+      else
+        ++linePos_;
 
       ++pos_;
     }
@@ -49,8 +57,13 @@ setPos(int pos)
     while (pos_ > pos1) {
       --pos_;
 
-      if (str_[pos_] == '\n')
+      if (str_[pos_] == '\n') {
         --lineNum_;
+
+        linePos_ = lineLen_[lineNum_];
+      }
+      else
+        --linePos_;
     }
   }
 

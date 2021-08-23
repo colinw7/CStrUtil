@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 
+#include <map>
 #include <string>
 
 class CStrParse {
@@ -27,6 +28,7 @@ class CStrParse {
   virtual void setPos(int pos);
 
   int lineNum() const { return lineNum_; }
+  int linePos() const { return linePos_; }
 
   // get string from current position to end
   virtual std::string getAt() const;
@@ -125,11 +127,15 @@ class CStrParse {
   }
 
  private:
+  using LineLen = std::map<int, int>;
+
   std::string            str_;
   uint                   pos_ { 0 };
   std::string::size_type len_ { 0 };
   bool                   autoSkipSpace_ { false };
   int                    lineNum_ { 1 };
+  int                    linePos_ { 0 };
+  LineLen                lineLen_;
 };
 
 #endif
