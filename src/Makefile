@@ -3,7 +3,6 @@ AR = ar
 RM = rm
 
 CDEBUG = -g
-LDEBUG = -g
 
 INC_DIR = ../include
 OBJ_DIR = ../obj
@@ -13,6 +12,7 @@ all: dirs $(LIB_DIR)/libCStrUtil.a
 
 dirs:
 	@if [ ! -e ../obj ]; then mkdir ../obj; fi
+	@if [ ! -e ../lib ]; then mkdir ../lib; fi
 	@if [ ! -e ../bin ]; then mkdir ../bin; fi
 
 SRC = \
