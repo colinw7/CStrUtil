@@ -126,6 +126,8 @@ class CStrParse {
     return getBefore() + getCharAt() + "\b_" + getAfter();
   }
 
+  void print() const;
+
  private:
   using LineLen = std::map<int, int>;
 

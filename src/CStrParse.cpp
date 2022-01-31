@@ -2,6 +2,7 @@
 #include <CStrUtil.h>
 #include <CUtf8.h>
 #include <cassert>
+#include <iostream>
 
 CStrParse::
 CStrParse(const std::string &str)
@@ -880,4 +881,36 @@ CStrParse::
 setEof()
 {
   pos_ = len_;
+}
+
+void
+CStrParse::
+print() const
+{
+  auto printChar = [&](char c) {
+    if (c == '\t') std::cerr << "\\t";
+    else           std::cerr << c;
+  };
+
+  auto printCaret = [&](char c) {
+    if (c == '\t') std::cerr << "^ ";
+    else           std::cerr << "^";
+  };
+
+  auto printSpace = [&](char c) {
+    if (c == '\t') std::cerr << "\\t";
+    else           std::cerr << " ";
+  };
+
+  for (std::size_t i = 0; i < len_; ++i)
+    printChar(str_[i]);
+  std::cerr << "\n";
+
+  for (std::size_t i = 0; i < len_; ++i) {
+    if (i == pos_)
+      printCaret(str_[i]);
+    else
+      printSpace(str_[i]);
+  }
+  std::cerr << "\n";
 }
