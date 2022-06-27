@@ -21,7 +21,7 @@ class CStrParse {
 
   virtual void addString(const std::string &str);
 
-  virtual int getPos() const { return pos_; }
+  virtual uint getPos() const { return pos_; }
 
   virtual std::string::size_type getLen() const { return len_; }
 

@@ -399,19 +399,19 @@ class CStrWord {
   const std::string &getWord() const { return word_; }
 
   int getStartPos() const { return pos_; }
-  int getEndPos  () const { return pos_ + word_.size() - 1; }
+  int getEndPos  () const { return pos_ + int(word_.size() - 1); }
 
   char getStartGroup() const { return start_group_; }
   char getEndGroup  () const { return end_group_  ; }
 
-  int getNumEscapeChars() const { return escape_chars_.size(); }
+  int getNumEscapeChars() const { return int(escape_chars_.size()); }
 
-  const CStrCharPos &getEscapeChar(int i) const { return escape_chars_[i]; }
+  const CStrCharPos &getEscapeChar(int i) const { return escape_chars_[size_t(i)]; }
 
   long   toInteger() const;
   double toReal   () const;
 
-  int size() const { return word_.size(); }
+  int size() const { return int(word_.size()); }
 
   const char *c_str() const { return word_.c_str(); }
 
@@ -429,7 +429,7 @@ class CStrWord {
 
     escape_chars_ = escape_chars1;
 
-    word_ = word_.substr(start, end - start + 1);
+    word_ = word_.substr(size_t(start), size_t(end - start + 1));
   }
 
   void shift(int delta) {
@@ -456,10 +456,6 @@ class CStrWord {
 };
 
 class CStrWords {
- private:
-  std::string           str_;
-  std::vector<CStrWord> word_datas_;
-
  public:
   typedef std::vector<CStrWord>::iterator iterator;
   typedef std::vector<CStrWord>::const_iterator const_iterator;
@@ -468,7 +464,7 @@ class CStrWords {
 
  ~CStrWords() { }
 
-  int size() const { return word_datas_.size(); }
+  size_t size() const { return word_datas_.size(); }
 
   void addWord(const std::string &word, int start_pos) {
     CStrWord word_data(word, start_pos);
@@ -481,10 +477,10 @@ class CStrWords {
   }
 
   const CStrWord &getWord(int pos) const {
-    if (pos < 0 || pos > size())
+    if (pos < 0 || pos > int(size()))
       throw "Invalid Subscript";
 
-    return word_datas_[pos];
+    return word_datas_[size_t(pos)];
   }
 
   void truncate(int start, int end);
@@ -500,6 +496,10 @@ class CStrWords {
   const CStrWord &operator[](int pos) const {
     return getWord(pos);
   }
+
+ private:
+  std::string           str_;
+  std::vector<CStrWord> word_datas_;
 };
 
 #endif

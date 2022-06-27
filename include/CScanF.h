@@ -25,13 +25,13 @@ class CScanF {
     const ValueType &type() const { return type_; }
 
     double             real   () const { assert(type_ == ValueType::REAL   ); return r_; }
-    double             integer() const { assert(type_ == ValueType::INTEGER); return i_; }
+    long               integer() const { assert(type_ == ValueType::INTEGER); return i_; }
     const std::string &string () const { assert(type_ == ValueType::STRING ); return s_; }
 
    private:
     ValueType   type_ { ValueType::NONE };
     double      r_    { 0.0 };
-    int         i_    { 0 };
+    long        i_    { 0 };
     std::string s_;
   };
 
@@ -51,9 +51,11 @@ class CScanF {
   virtual void addReal   (double r);
   virtual void addString (const std::string &s);
 
-  int numValues() const { return values_.size(); }
+  int numValues() const { return int(values_.size()); }
 
-  const Value &value(int i) { assert(i >= 0 && i < int(values_.size())); return values_[i]; }
+  const Value &value(int i) {
+    assert(i >= 0 && i < int(values_.size())); return values_[size_t(i)];
+  }
 
  private:
   std::string format_;

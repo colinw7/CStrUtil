@@ -14,6 +14,7 @@
 #include <climits>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 
 static CWordDef    s_word_def;
 static std::string s_base_chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -128,13 +129,18 @@ std::string
 CStrUtil::
 toString(const std::vector<std::string> &words, int start, int end, const std::string &sep)
 {
+  assert(start >= 0);
+
   std::string str;
 
-  if (end == -1)
-    end = words.size() - 1;
+  if (end < 0) {
+    end = int(words.size()) + end;
 
-  for (int i = start; i <= end; i++) {
-    if (i > start)
+    assert(end >= 0);
+  }
+
+  for (uint i = uint(start); i <= uint(end); ++i) {
+    if (i > uint(start))
       str += sep;
 
     str += words[i];
@@ -154,13 +160,18 @@ std::string
 CStrUtil::
 toString(const char **words, uint num_words, int start, int end, const std::string &sep)
 {
+  assert(start >= 0);
+
   std::string str;
 
-  if (end == -1)
-    end = num_words - 1;
+  if (end < 0) {
+    end = int(num_words) + end;
 
-  for (int i = start; i <= end; i++) {
-    if (i > start)
+    assert(end >= 0);
+  }
+
+  for (uint i = uint(start); i <= uint(end); ++i) {
+    if (i > uint(start))
       str += sep;
 
     str += words[i];
@@ -180,7 +191,7 @@ toString(std::vector<std::string>::const_iterator pstr1,
 
   std::string str;
 
-  for (pstr = pstr1; pstr != pstr2; ++pstr, i++) {
+  for (pstr = pstr1; pstr != pstr2; ++pstr, ++i) {
     if (i > 0)
       str += sep;
 
@@ -196,36 +207,36 @@ toString(const CStrWords &words, const std::string &sep)
 {
   std::string str;
 
-  uint num_words = words.size();
+  uint num_words = uint(words.size());
 
-  for (uint i = 0; i < num_words; i++) {
+  for (uint i = 0; i < num_words; ++i) {
     if (i > 0)
       str += sep;
 
-    uint pos = str.size();
+    uint pos = uint(str.size());
 
-    while ((int) pos < words[i].getStartPos()) {
+    while (int(pos) < words[int(i)].getStartPos()) {
       str += sep;
 
       ++pos;
     }
 
-    char c1 = words[i].getStartGroup();
-    char c2 = words[i].getEndGroup();
+    char c1 = words[int(i)].getStartGroup();
+    char c2 = words[int(i)].getEndGroup();
 
     if (c1 != '\0')
       str += c1;
 
-    int num_escapes = words[i].getNumEscapeChars();
+    int num_escapes = words[int(i)].getNumEscapeChars();
 
     if (num_escapes > 0) {
-      std::string word = words[i].getWord();
+      std::string word = words[int(i)].getWord();
 
       for (int j = 0; j < num_escapes; j++) {
-        const CStrCharPos &escape_char = words[i].getEscapeChar(j);
+        const CStrCharPos &escape_char = words[int(i)].getEscapeChar(j);
 
-        std::string wordl = word.substr(0, escape_char.getPos());
-        std::string wordr = word.substr(escape_char.getPos());
+        std::string wordl = word.substr(0, size_t(escape_char.getPos()));
+        std::string wordr = word.substr(size_t(escape_char.getPos()));
 
         word = wordl + escape_char.getChar() + wordr;
       }
@@ -233,7 +244,7 @@ toString(const CStrWords &words, const std::string &sep)
       str += word;
     }
     else
-      str += words[i].getWord();
+      str += words[int(i)].getWord();
 
     if (c2 != '\0')
       str += c2;
@@ -248,12 +259,12 @@ decodeHexString(const std::string &str, uint *value)
 {
   *value = 0;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint value1;
 
   for (uint i = 0; i < len; ++i) {
-    if (! decodeHexChar(str[i], &value1))
+    if (! decodeHexChar(static_cast<unsigned char>(str[i]), &value1))
       return false;
 
     *value = 16*(*value) + value1;
@@ -289,9 +300,9 @@ CStrUtil::
 toHexString(signed int integer, uint width)
 {
   if (integer < 0)
-    return "-" + toHexString((uint) -integer, width);
+    return "-" + toHexString(uint(-integer), width);
   else
-    return       toHexString((uint)  integer, width);
+    return       toHexString(uint( integer), width);
 }
 
 void
@@ -330,13 +341,13 @@ toOctString(int integer)
     int i1 = i / 8;
     int i2 = i % 8;
 
-    str = (char) (i2 + '0') + str;
+    str = char(i2 + '0') + str;
 
     i = i1;
   }
 
   if (i > 0)
-    str = (char) (i + '0') + str;
+    str = char(i + '0') + str;
 
   return str;
 }
@@ -345,7 +356,7 @@ std::string
 CStrUtil::
 toBaseString(int integer, uint base)
 {
-  if (base < 2 || base > s_base_chars.size()) {
+  if (base < 2 || base > uint(s_base_chars.size())) {
     CTHROW("Unsupported Base " + CStrUtil::toString(base));
     return "";
   }
@@ -354,7 +365,7 @@ toBaseString(int integer, uint base)
 
   std::string str;
 
-  uint i = std::abs(integer);
+  uint i = uint(std::abs(integer));
 
   while (i >= base) {
     uint i1 = i / base;
@@ -395,7 +406,7 @@ toOctStringInWidth(int integer, uint width)
   std::string str;
 
   for (uint i = 0; i < width; ++i)
-    str += (char) (digits[i] + '0');
+    str += char(digits[i] + '0');
 
   return str;
 }
@@ -406,9 +417,9 @@ toBitString(int c)
 {
   static char buffer[9];
 
-  uint c1 = c;
+  uint c1 = uint(c);
 
-  for (uint i = 0; i < 8; i++)
+  for (uint i = 0; i < 8; ++i)
     buffer[i] = ((c1 >> (7 - i)) & 0x01) ? '1' : '0';
 
   buffer[8] = '\0';
@@ -487,7 +498,7 @@ isInteger(const std::string &str)
 
   errno = 0;
 
-  strtol(&c_str[i], (char **) &p, 10);
+  strtol(&c_str[i], const_cast<char **>(&p), 10);
 
   if (errno == ERANGE)
     return false;
@@ -524,7 +535,7 @@ toInteger(const std::string &str, short *integer)
   if (! toInteger(str, &integer1))
     return false;
 
-  *integer = (short) integer1;
+  *integer = short(integer1);
 
   return true;
 }
@@ -538,7 +549,7 @@ toInteger(const std::string &str, int *integer)
   if (! toInteger(str, &integer1))
     return false;
 
-  *integer = (int) integer1;
+  *integer = int(integer1);
 
   return true;
 }
@@ -555,7 +566,7 @@ toInteger(const std::string &str, uint *integer)
   if (integer1 < 0)
     return false;
 
-  *integer = (uint) integer1;
+  *integer = uint(integer1);
 
   return true;
 }
@@ -580,7 +591,7 @@ toInteger(const std::string &str, long *integer)
 
   errno = 0;
 
-  *integer = strtol(&c_str[i], (char **) &p, 10);
+  *integer = strtol(&c_str[i], const_cast<char **>(&p), 10);
 
   if (errno == ERANGE) {
     s_error_msg = "Out of Range";
@@ -602,13 +613,13 @@ bool
 CStrUtil::
 isBaseInteger(const std::string &str, uint base)
 {
-  if (base < 2 || base > s_base_chars.size()) {
+  if (base < 2 || base > uint(s_base_chars.size())) {
     CTHROW("Unsupported Base " + CStrUtil::toString(base));
     return false;
   }
 
   uint i   = 0;
-  uint len = str.size();
+  uint len = uint(str.size());
 
   while (i < len) {
     int c = str[i];
@@ -647,7 +658,7 @@ toBaseInteger(const std::string &str, uint base, int *integer)
     return false;
   }
 
-  *integer = (int) integer1;
+  *integer = int(integer1);
 
   return true;
 }
@@ -663,7 +674,7 @@ toBaseInteger(const std::string &str, uint base, uint *integer)
     return false;
   }
 
-  *integer = (uint) integer1;
+  *integer = uint(integer1);
 
   return true;
 }
@@ -674,13 +685,13 @@ toBaseInteger(const std::string &str, uint base, long *integer)
 {
   *integer = 0;
 
-  if (base < 2 || base > s_base_chars.size()) {
+  if (base < 2 || base > uint(s_base_chars.size())) {
     s_error_msg = "Unsupported Base " + CStrUtil::toString(base);
     return false;
   }
 
   uint i   = 0;
-  uint len = str.size();
+  uint len = uint(str.size());
 
   while (i < len) {
     int c = str[i];
@@ -692,7 +703,7 @@ toBaseInteger(const std::string &str, uint base, long *integer)
 
     long integer1 = base*(*integer) + value;
 
-    if (long((integer1 - (long) value)/base) != *integer) {
+    if (long((integer1 - long(value))/base) != *integer) {
       s_error_msg = "Overflow.";
       return false;
     }
@@ -732,7 +743,7 @@ isReal(const std::string &str)
   else {
     errno = 0;
 
-    strtod(&c_str[i], (char **) &p);
+    strtod(&c_str[i], const_cast<char **>(&p));
 
     if (errno == ERANGE)
       return false;
@@ -740,7 +751,7 @@ isReal(const std::string &str)
 #else
   errno = 0;
 
-  strtod(&c_str[i], (char **) &p);
+  strtod(&c_str[i], const_cast<char **>(&p));
 
   if (errno == ERANGE)
     return false;
@@ -796,7 +807,7 @@ toReal(const std::string &str, double *real)
   else {
     errno = 0;
 
-    *real = strtod(&c_str[i], (char **) &p);
+    *real = strtod(&c_str[i], const_cast<char **>(&p));
 
     if (errno == ERANGE) {
       s_error_msg = "Out of Range";
@@ -806,7 +817,7 @@ toReal(const std::string &str, double *real)
 #else
   errno = 0;
 
-  *real = strtod(&c_str[i], (char **) &p);
+  *real = strtod(&c_str[i], const_cast<char **>(&p));
 
   if (errno == ERANGE) {
     s_error_msg = "Out of Range";
@@ -829,7 +840,7 @@ bool
 CStrUtil::
 isBaseChar(int c, uint base, int *value)
 {
-  if (base < 2 || base > s_base_chars.size()) {
+  if (base < 2 || base > uint(s_base_chars.size())) {
     CTHROW("Unsupported Base " + CStrUtil::toString(base));
     return false;
   }
@@ -839,7 +850,7 @@ isBaseChar(int c, uint base, int *value)
   if (::islower(c1))
     c1 = toupper(c1);
 
-  auto pos = s_base_chars.find((char) c1);
+  auto pos = s_base_chars.find(char(c1));
 
   if (pos == std::string::npos || pos >= base) {
     s_error_msg = std::string("Invalid Character ") + char(c) +
@@ -857,7 +868,7 @@ bool
 CStrUtil::
 isCComment(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (pos < len - 1 && str[pos] == '/' && str[pos + 1] == '*')
     return true;
@@ -869,7 +880,7 @@ bool
 CStrUtil::
 readCComment(const std::string &str, uint *pos, bool *in_comment, std::string &comment)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (! *in_comment) {
     if (*pos < len - 1 && str[*pos] == '/' && str[*pos + 1] == '*') {
@@ -899,7 +910,7 @@ bool
 CStrUtil::
 isCNumber(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (pos < len && ::isdigit(str[pos]))
     return true;
@@ -916,7 +927,7 @@ readCNumber(const std::string &str, uint *pos, std::string &number)
 {
   number = "";
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   // hexadecimal-literal:
   //  '0x' hexadecimal-digits integer-suffix(opt)
@@ -1063,7 +1074,7 @@ bool
 CStrUtil::
 isCCharacter(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (pos < len && str[pos] == '\'')
     return true;
@@ -1080,7 +1091,7 @@ readCCharacter(const std::string &str, uint *pos, std::string &character)
 {
   // TODO: support multi-character sequences
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   character = "";
 
@@ -1220,7 +1231,7 @@ bool
 CStrUtil::
 isCString(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (pos < len && str[pos] == '\"')
     return true;
@@ -1235,7 +1246,7 @@ bool
 CStrUtil::
 readCString(const std::string &str, uint *pos, std::string &cstring)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   cstring = "";
 
@@ -1288,7 +1299,8 @@ std::string
 CStrUtil::
 stripSpaces(const std::string &str, bool front, bool back)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
+  if (len == 0) return str;
 
   uint start_index = 0;
 
@@ -1307,15 +1319,15 @@ stripSpaces(const std::string &str, bool front, bool back)
   uint end_index = len - 1;
 
   if (back) {
-    int i = len - 1;
+    int i = int(len - 1);
 
-    while (i >= 0 && ::isspace(str[i]))
+    while (i >= 0 && ::isspace(str[uint(i)]))
       i--;
 
     if (i < 0)
       return "";
 
-    end_index = i;
+    end_index = uint(i);
   }
 
   return str.substr(start_index, end_index - start_index + 1);
@@ -1327,7 +1339,9 @@ stripSpaces(const char *str, bool front, bool back)
 {
   std::string str1(str);
 
-  static std::string str2 = stripSpaces(str1, front, back);
+  static std::string str2;
+
+  str2 = stripSpaces(str1, front, back);
 
   return str2.c_str();
 }
@@ -1336,9 +1350,10 @@ char *
 CStrUtil::
 stripSpaces(char *str, bool front, bool back)
 {
-  uint len = strlen(str);
+  uint len = uint(strlen(str));
+  if (len == 0) return str;
 
-  int start_index = 0;
+  uint start_index = 0;
 
   if (front) {
     uint i = 0;
@@ -1354,10 +1369,10 @@ stripSpaces(char *str, bool front, bool back)
     start_index = i;
   }
 
-  int end_index = len - 1;
+  uint end_index = len - 1;
 
   if (back) {
-    int i = len - 1;
+    int i = int(len - 1);
 
     while (i >= 0 && ::isspace(str[i]))
       i--;
@@ -1367,7 +1382,7 @@ stripSpaces(char *str, bool front, bool back)
       return str;
     }
 
-    end_index = i;
+    end_index = uint(i);
   }
 
   str[end_index + 1] = '\0';
@@ -1382,7 +1397,7 @@ std::string
 CStrUtil::
 compressSpaces(const std::string &str)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -1410,11 +1425,11 @@ toUpper(const std::string &str)
 {
   std::string str1 = str;
 
-  uint len = str1.size();
+  uint len = uint(str1.size());
 
-  for (uint i = 0; i < len; i++)
+  for (uint i = 0; i < len; ++i)
     if (::islower(str1[i]))
-      str1[i] = toupper(str1[i]);
+      str1[i] = char(toupper(str1[i]));
 
   return str1;
 }
@@ -1423,11 +1438,11 @@ char *
 CStrUtil::
 toUpper(char *str)
 {
-  uint len = strlen(str);
+  uint len = uint(strlen(str));
 
-  for (uint i = 0; i < len; i++)
+  for (uint i = 0; i < len; ++i)
     if (::islower(str[i]))
-      str[i] = toupper(str[i]);
+      str[i] = char(toupper(str[i]));
 
   return str;
 }
@@ -1438,7 +1453,9 @@ toUpper(const char *str)
 {
   std::string str1(str);
 
-  static std::string str2 = toUpper(str1);
+  static std::string str2;
+
+  str2 = toUpper(str1);
 
   return str2.c_str();
 }
@@ -1449,11 +1466,11 @@ toLower(const std::string &str)
 {
   std::string str1 = str;
 
-  uint len = str1.size();
+  uint len = uint(str1.size());
 
-  for (uint i = 0; i < len; i++)
+  for (uint i = 0; i < len; ++i)
     if (::isupper(str1[i]))
-      str1[i] = tolower(str1[i]);
+      str1[i] = char(tolower(str1[i]));
 
   return str1;
 }
@@ -1462,11 +1479,11 @@ char *
 CStrUtil::
 toLower(char *str)
 {
-  uint len = strlen(str);
+  uint len = uint(strlen(str));
 
-  for (uint i = 0; i < len; i++)
+  for (uint i = 0; i < len; ++i)
     if (::isupper(str[i]))
-      str[i] = tolower(str[i]);
+      str[i] = char(tolower(str[i]));
 
   return str;
 }
@@ -1477,7 +1494,9 @@ toLower(const char *str)
 {
   std::string str1(str);
 
-  static std::string str2 = toLower(str1);
+  static std::string str2;
+
+  str2 = toLower(str1);
 
   return str2.c_str();
 }
@@ -1488,14 +1507,14 @@ capitalize(const std::string &str)
 {
   std::string str1 = str;
 
-  uint len = str1.size();
+  uint len = uint(str1.size());
 
-  for (uint i = 0; i < len; i++) {
+  for (uint i = 0; i < len; ++i) {
     if (i == 0 && ::islower(str1[i]))
-      str1[i] = toupper(str1[i]);
+      str1[i] = char(toupper(str1[i]));
 
     if (i > 0 && ::isupper(str1[i]))
-      str1[i] = tolower(str1[i]);
+      str1[i] = char(tolower(str1[i]));
   }
 
   return str1;
@@ -1614,9 +1633,9 @@ translate(const std::string &str, const std::string &old_chars,
 
   std::string str1 = str;
 
-  uint len = str1.size();
+  uint len = uint(str1.size());
 
-  for (uint i = 0; i < len; i++) {
+  for (uint i = 0; i < len; ++i) {
     std::string::size_type pos = old_chars.find(str1[i]);
 
     if (pos == std::string::npos)
@@ -1626,7 +1645,7 @@ translate(const std::string &str, const std::string &old_chars,
       if (one_to_n) {
         str1 = str1.substr(0, i) + new_chars + str1.substr(i + 1);
 
-        len = str1.size();
+        len = uint(str1.size());
       }
       else
         str1[i] = new_chars[pos];
@@ -1646,7 +1665,7 @@ translate(const std::string &str, const std::string &old_chars,
 
       str1 = strl + strr;
 
-      len = str1.size();
+      len = uint(str1.size());
 
       i--;
     }
@@ -1664,7 +1683,7 @@ toWords(const std::string &str, CWordDef *def)
 
   CStrWords words(str);
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -1699,7 +1718,7 @@ addWords(const std::string &str, std::vector<std::string> &words, CWordDef *def)
   if (! def)
     def = &s_word_def;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -1726,10 +1745,10 @@ toIntegers(const std::string &str, std::vector<int> &integers, const std::string
 
   addWords(str, words, splitters);
 
-  uint num_words = words.size();
+  uint num_words = uint(words.size());
 
   for (uint i = 0; i < num_words; ++i)
-    integers.push_back(toInteger(words[i]));
+    integers.push_back(int(toInteger(words[i])));
 }
 
 void
@@ -1745,7 +1764,7 @@ void
 CStrUtil::
 addWords(const std::string &str, std::vector<std::string> &words, const std::string &splitters)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -1790,12 +1809,12 @@ readWord(const std::string &str, uint *pos, CWordDef *def)
   if (! def)
     def = &s_word_def;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   CStrWord word;
 
   std::string word_str;
-  int         word_pos = *pos;
+  uint        word_pos = *pos;
 
   if      (def->isStartGroupI(str[*pos])) {
     word.setStartGroup(str[*pos]);
@@ -1804,7 +1823,7 @@ readWord(const std::string &str, uint *pos, CWordDef *def)
 
     while (*pos < len) {
       if      (def->getAllowEscapes() && str[*pos] == def->getEscapeChar()) {
-        word.addEscapeChar(str[*pos], *pos);
+        word.addEscapeChar(str[*pos], int(*pos));
 
         ++(*pos);
 
@@ -1825,7 +1844,7 @@ readWord(const std::string &str, uint *pos, CWordDef *def)
   else if (def->isWordChar(str[*pos])) {
     while (*pos < len) {
       if      (def->getAllowEscapes() && str[*pos] == def->getEscapeChar()) {
-        word.addEscapeChar(str[*pos], *pos);
+        word.addEscapeChar(str[*pos], int(*pos));
 
         ++(*pos);
 
@@ -1841,7 +1860,7 @@ readWord(const std::string &str, uint *pos, CWordDef *def)
   else
     ++(*pos);
 
-  word.setWord(word_str, word_pos);
+  word.setWord(word_str, int(word_pos));
 
   return word;
 }
@@ -1889,7 +1908,7 @@ bool
 CStrUtil::
 skipSpace(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos >= len || ! ::isspace(str[*pos]))
     return false;
@@ -1904,12 +1923,12 @@ bool
 CStrUtil::
 skipSpace(const std::string &str, int *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
-  if (*pos >= (int) len || ! ::isspace(str[*pos]))
+  if (*pos >= int(len) || ! ::isspace(str[uint(*pos)]))
     return false;
 
-  while (*pos < (int) len && ::isspace(str[*pos]))
+  while (*pos < int(len) && ::isspace(str[uint(*pos)]))
     ++(*pos);
 
   return true;
@@ -1958,12 +1977,12 @@ bool
 CStrUtil::
 skipNonSpace(const std::string &str, int *pos)
 {
-  int len = str.size();
+  uint len = uint(str.size());
 
-  if (*pos >= len || ::isspace(str[*pos]))
+  if (*pos >= int(len) || ::isspace(str[uint(*pos)]))
     return false;
 
-  while (*pos < len && ! ::isspace(str[*pos]))
+  while (*pos < int(len) && ! ::isspace(str[uint(*pos)]))
     ++(*pos);
 
   return true;
@@ -1973,7 +1992,7 @@ bool
 CStrUtil::
 skipNonSpace(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos >= len || ::isspace(str[*pos]))
     return false;
@@ -1988,7 +2007,7 @@ bool
 CStrUtil::
 skipDoubleQuotedString(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos >= len || str[*pos] != '\"')
     return false;
@@ -2020,7 +2039,7 @@ bool
 CStrUtil::
 skipSingleQuotedString(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos >= len || str[*pos] != '\'')
     return false;
@@ -2058,7 +2077,7 @@ skipBackQuotedString(const std::string &str, uint *pos)
   if (str[*pos] != '`')
     return false;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   ++(*pos);
 
@@ -2093,7 +2112,7 @@ toFields(const std::string &str, const std::string &splitters, bool skipEmpty)
 
   std::string word;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   bool use_splitters = ! splitters.empty();
 
@@ -2131,13 +2150,13 @@ toFields(const std::string &str, const std::string &splitters, bool skipEmpty)
     if (end_pos > start_pos) {
       word = str.substr(start_pos, end_pos - start_pos);
 
-      words.addWord(word, start_pos);
+      words.addWord(word, int(start_pos));
     }
     else {
       if (! skipEmpty) {
         word = "";
 
-        words.addWord(word, start_pos);
+        words.addWord(word, int(start_pos));
       }
     }
 
@@ -2182,13 +2201,13 @@ toFields(const std::string &str, const std::string &splitters, bool skipEmpty)
     if (end_pos > start_pos) {
       word = str.substr(start_pos, end_pos - start_pos);
 
-      words.addWord(word, start_pos);
+      words.addWord(word, int(start_pos));
     }
     else {
       if (! skipEmpty) {
         word = "";
 
-        words.addWord(word, start_pos);
+        words.addWord(word, int(start_pos));
       }
     }
   }
@@ -2205,7 +2224,7 @@ addFields(const std::string &str, std::vector<std::string> &words,
 
   std::string word;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   bool use_splitters = ! splitters.empty();
 
@@ -2318,7 +2337,7 @@ toTokens(const std::string &str, const std::string &separators)
 
   //------
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -2331,7 +2350,7 @@ toTokens(const std::string &str, const std::string &separators)
     if (i > j) {
       std::string word = str.substr(j, i - j);
 
-      words.addWord(word, j);
+      words.addWord(word, int(j));
     }
 
     while (i < len && separators.find(str[i]) != std::string::npos)
@@ -2353,7 +2372,7 @@ addTokens(const std::string &str, std::vector<std::string> &words, const std::st
 
   //------
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -2383,7 +2402,7 @@ readInteger(const std::string &str, uint *pos, int *integer)
   if (! readInteger(str, pos, &i))
     return false;
 
-  *integer = i;
+  *integer = int(i);
 
   return true;
 }
@@ -2451,7 +2470,7 @@ readBaseInteger(const std::string &str, uint base, uint *pos, int *integer)
   if (! readBaseInteger(str, base, pos, &i))
     return false;
 
-  *integer = i;
+  *integer = int(i);
 
   return true;
 }
@@ -2499,7 +2518,7 @@ readBaseInteger(const char *str, uint base, uint *pos, int *integer)
   //------
 
   if (integer)
-    *integer = toBaseInteger(std::string(&str[i], *pos - i), base);
+    *integer = int(toBaseInteger(std::string(&str[i], *pos - i), base));
 
   //------
 
@@ -2510,7 +2529,7 @@ bool
 CStrUtil::
 skipInteger(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos < len && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
@@ -2548,7 +2567,7 @@ bool
 CStrUtil::
 skipBaseInteger(const std::string &str, uint base, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos < len && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
@@ -2609,7 +2628,7 @@ readNumber(const std::string &str, uint *pos, double &real, int &integer, bool &
 
   //------
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   std::string number_str;
 
@@ -2740,15 +2759,13 @@ bool
 CStrUtil::
 isIdentifier(const std::string &str)
 {
-  uint len = str.size();
-
-  if (len == 0)
-    return false;
+  uint len = uint(str.size());
+  if (len == 0) return false;
 
   if (str[0] != '_' && ! ::isalpha(str[0]))
     return false;
 
-  for (uint i = 1; i < len; i++)
+  for (uint i = 1; i < len; ++i)
     if (str[i] != '_' && ! ::isalnum(str[i]))
       return false;
 
@@ -2759,7 +2776,7 @@ bool
 CStrUtil::
 isIdentifier(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (pos < len && (str[pos] == '_' || ::isalpha(str[pos])))
     return true;
@@ -2771,7 +2788,7 @@ bool
 CStrUtil::
 readIdentifier(const std::string &str, uint *pos, std::string &identifier)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos < len && (str[*pos] == '_' || ::isalpha(str[*pos]))) {
     identifier = str[(*pos)++];
@@ -2789,7 +2806,7 @@ bool
 CStrUtil::
 skipIdentifier(const std::string &str, uint *pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos < len && (str[*pos] == '_' || ::isalpha(str[*pos]))) {
     ++(*pos);
@@ -2828,7 +2845,7 @@ bool
 CStrUtil::
 isCOperator(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   return (pos < len && isCOperatorChar(str[pos]));
 }
@@ -2837,7 +2854,7 @@ bool
 CStrUtil::
 readCOperator(const std::string &str, uint *pos, std::string &opstr)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   opstr = "";
 
@@ -3118,7 +3135,7 @@ bool
 CStrUtil::
 isCSeparator(const std::string &str, uint pos)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   return (pos < len && isCSeparatorChar(str[pos]));
 }
@@ -3127,7 +3144,7 @@ bool
 CStrUtil::
 readCSeparator(const std::string &str, uint *pos, std::string &separator)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   separator = "";
 
@@ -3165,7 +3182,7 @@ replaceCTriGraphs(std::string &line)
 {
   std::string line1;
 
-  uint len = line.size();
+  uint len = uint(line.size());
   uint pos = 0;
 
   while (pos < len) {
@@ -3208,7 +3225,7 @@ bool
 CStrUtil::
 readNonSpace(const std::string &str, uint *pos, std::string &word)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   if (*pos >= len || ::isspace(str[*pos]))
     return false;
@@ -3225,11 +3242,12 @@ std::string
 CStrUtil::
 replaceEscapeCodes(const std::string &str)
 {
-  int len = str.size();
+  uint len = uint(str.size());
+  if (len == 0) return str;
 
   bool has_escape = false;
 
-  for (int i = 0; i < len - 1; ++i)
+  for (uint i = 0; i < len - 1; ++i)
     if (str[i] == '\\') {
       has_escape = true;
       break;
@@ -3240,7 +3258,7 @@ replaceEscapeCodes(const std::string &str)
 
   std::string str1;
 
-  int i = 0;
+  uint i = 0;
 
   while (i < len - 1) {
     if (str[i] != '\\') {
@@ -3286,7 +3304,7 @@ replaceEscapeCodes(const std::string &str)
               hex_value += (str[i] - 'A' + 10);
           }
 
-          str1 += hex_value;
+          str1 += char(hex_value);
         }
         else {
           str1 += '\\';
@@ -3322,7 +3340,7 @@ replaceEscapeCodes(const std::string &str)
             oct_value += (str[i] - '0');
           }
 
-          str1 += oct_value;
+          str1 += char(oct_value);
         }
         else {
           str1 += '\\';
@@ -3350,7 +3368,7 @@ encodeEscapeChar(const std::string &str, char *c)
 {
   *c = '\0';
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint pos = 0;
 
@@ -3395,7 +3413,7 @@ encodeEscapeChar(const std::string &str, char *c)
             hex_value += (str[pos] - 'A' + 10);
         }
 
-        *c = (char) hex_value;
+        *c = char(hex_value);
       }
       else
         return false;
@@ -3429,7 +3447,7 @@ encodeEscapeChar(const std::string &str, char *c)
           oct_value += (str[pos] - '0');
         }
 
-        *c = (char) oct_value;
+        *c = char(oct_value);
       }
       else
         *c = '\0';
@@ -3454,9 +3472,9 @@ addEscapeChars(const std::string &str, const std::string &chars)
 {
   std::string str1;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
-  for (uint i = 0; i < len; i++) {
+  for (uint i = 0; i < len; ++i) {
     if (str[i] == '\\' || chars.find(str[i]) != std::string::npos)
       str1 += '\\';
 
@@ -3472,9 +3490,9 @@ removeEscapeChars(const std::string &str)
 {
   std::string str1;
 
-  int len = str.size();
+  uint len = uint(str.size());
 
-  int i = 0;
+  uint i = 0;
 
   while (i < len) {
     if (i < len - 1 && str[i] == '\\')
@@ -3507,7 +3525,7 @@ std::string
 CStrUtil::
 insertEscapeCodes(const std::string &str)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   uint i = 0;
 
@@ -3549,9 +3567,9 @@ insertEscapeCodes(const std::string &str)
         int digit2 = (c - digit1*64)/8;
         int digit3 = c - digit1*64 - digit2*8;
 
-        str1 += '0' + digit1;
-        str1 += '0' + digit2;
-        str1 += '0' + digit3;
+        str1 += char('0' + digit1);
+        str1 += char('0' + digit2);
+        str1 += char('0' + digit3);
 
         break;
       }
@@ -3564,10 +3582,10 @@ insertEscapeCodes(const std::string &str)
 class CStrNumCmpFunctor {
  public:
   bool operator()(const std::string &str1, const std::string &str2) {
-    int i1   = 0;
-    int i2   = 0;
-    int len1 = str1.size();
-    int len2 = str2.size();
+    uint i1   = 0;
+    uint i2   = 0;
+    uint len1 = uint(str1.size());
+    uint len2 = uint(str2.size());
 
     while (i1 < len1 && i2 < len2) {
       char c1 = str1[i1++];
@@ -3665,7 +3683,7 @@ mostMatch(const std::vector<std::string> &strs, int &ind)
 {
   ind = -1;
 
-  uint num_strs = strs.size();
+  uint num_strs = uint(strs.size());
 
   if (num_strs == 0)
     return "";
@@ -3676,14 +3694,14 @@ mostMatch(const std::vector<std::string> &strs, int &ind)
     return strs[0];
   }
 
-  uint len = strs[0].size();
+  uint len = uint(strs[0].size());
 
-  for (uint i = 0; i < len; i++) {
+  for (uint i = 0; i < len; ++i) {
     for (uint j = 1; j < num_strs; j++) {
-      uint len1 = strs[j].size();
+      uint len1 = uint(strs[j].size());
 
       if (i >= len1 || strs[0][i] != strs[j][i]) {
-        ind = j;
+        ind = int(j);
 
         return strs[0].substr(0, i);
       }
@@ -3720,14 +3738,14 @@ char *
 CStrUtil::
 strdup(const char *str)
 {
-  return strcpy(new char [strlen(str) + 1], str);
+  return strcpy(new char [uint(strlen(str)) + 1], str);
 }
 
 char *
 CStrUtil::
 strdup(const std::string &str)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   char *str1 = new char [len + 1];
 
@@ -3755,10 +3773,10 @@ char *
 CStrUtil::
 strstr(const char *str1, const char *str2)
 {
-  int len = strlen(str1);
+  uint len = uint(strlen(str1));
 
-  char *p1 = (char *) str1;
-  char *p2 = (char *) &str1[len - 1];
+  char *p1 = const_cast<char *>(str1);
+  char *p2 = const_cast<char *>(&str1[len - 1]);
 
   return strstr(p1, p2, str2, -1);
 }
@@ -3767,10 +3785,10 @@ char *
 CStrUtil::
 strrstr(const char *str1, const char *str2)
 {
-  int len = strlen(str1);
+  uint len = uint(strlen(str1));
 
-  char *p1 = (char *) &str1[len - 1];
-  char *p2 = (char *) str1;
+  char *p1 = const_cast<char *>(&str1[len - 1]);
+  char *p2 = const_cast<char *>(str1);
 
   return strrstr(p1, p2, str2, -1);
 }
@@ -3780,20 +3798,20 @@ CStrUtil::
 strstr(const char *p1, const char *p2, const char *str, int len)
 {
   if (len < 0)
-    len = strlen(str);
+    len = int(strlen(str));
 
   if (len == 0)
     return 0;
 
   char c = str[0];
 
-  char *ps = (char *) p1;
-  char *pe = (char *) p2 - len + 1;
+  char *ps = const_cast<char *>(p1);
+  char *pe = const_cast<char *>(p2 - len + 1);
 
   char *p = strchr(ps, pe, c);
 
   while (p) {
-    if (strncmp(p, str, len) == 0)
+    if (strncmp(p, str, size_t(len)) == 0)
       return p;
 
     ++ps;
@@ -3812,20 +3830,20 @@ CStrUtil::
 strrstr(const char *p1, const char *p2, const char *str, int len)
 {
   if (len < 0)
-    len = strlen(str);
+    len = int(strlen(str));
 
   if (len == 0)
     return 0;
 
   char c = str[0];
 
-  char *ps = (char *) p1 - len + 1;
-  char *pe = (char *) p2;
+  char *ps = const_cast<char *>(p1 - len + 1);
+  char *pe = const_cast<char *>(p2);
 
   char *p = strrchr(ps, pe, c);
 
   while (p) {
-    if (strncmp(p, str, len) == 0)
+    if (strncmp(p, str, size_t(len)) == 0)
       return p;
 
     --ps;
@@ -3843,10 +3861,10 @@ char *
 CStrUtil::
 strchr(const char *str, char c)
 {
-  int len = strlen(str);
+  uint len = uint(strlen(str));
 
-  char *p1 = (char *) str;
-  char *p2 = (char *) &str[len - 1];
+  char *p1 = const_cast<char *>(str);
+  char *p2 = const_cast<char *>(&str[len - 1]);
 
   return strchr(p1, p2, c);
 }
@@ -3855,10 +3873,10 @@ char *
 CStrUtil::
 strrchr(const char *str, char c)
 {
-  int len = strlen(str);
+  uint len = uint(strlen(str));
 
-  char *p1 = (char *) &str[len - 1];
-  char *p2 = (char *) str;
+  char *p1 = const_cast<char *>(&str[len - 1]);
+  char *p2 = const_cast<char *>(str);
 
   return strrchr(p1, p2, c);
 }
@@ -3869,7 +3887,7 @@ strchr(const char *p1, const char *p2, char c)
 {
   for (const char *p = p1; p <= p2; ++p)
     if (*p == c)
-      return (char *) p;
+      return const_cast<char *>(p);
 
   return 0;
 }
@@ -3880,7 +3898,7 @@ strrchr(const char *p1, const char *p2, char c)
 {
   for (const char *p = p1; p >= p2; --p)
     if (*p == c)
-      return (char *) p;
+      return const_cast<char *>(p);
 
   return 0;
 }
@@ -3889,7 +3907,7 @@ void
 CStrUtil::
 addLines(const std::string &str, std::vector<std::string> &lines)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   std::string str1;
   std::string line;
@@ -3900,14 +3918,14 @@ addLines(const std::string &str, std::vector<std::string> &lines)
     lines.push_back(line);
   }
 
-  len = str1.size();
+  len = uint(str1.size());
 
   while (len > 0) {
     str1 = readLine(str1, line);
 
     lines.push_back(line);
 
-    len = str1.size();
+    len = uint(str1.size());
   }
 }
 
@@ -3915,7 +3933,7 @@ std::string
 CStrUtil::
 readLine(const std::string &str, std::string &line)
 {
-  uint len = str.size();
+  uint len = uint(str.size());
 
   line = "";
 
@@ -3996,13 +4014,13 @@ std::string
 CStrUtil::
 concatFileNames(const std::string &lhs, const std::string &rhs)
 {
-  int l2 = lhs.size();
+  uint l2 = uint(lhs.size());
 
   while (l2 > 0 && lhs[l2 - 1] == '/')
     l2--;
 
-  int r1 = 0;
-  int r2 = rhs.size();
+  uint r1 = 0;
+  uint r2 = uint(rhs.size());
 
   while (r1 < r2 && rhs[r1] == '/')
     ++r1;
@@ -4020,7 +4038,7 @@ maxLen(std::vector<std::string> &strs)
   std::vector<std::string>::const_iterator p2 = strs.end  ();
 
   for ( ; p1 != p2; ++p1) {
-    uint len1 = (*p1).size();
+    uint len1 = uint((*p1).size());
 
     len = std::max(len, len1);
   }
@@ -4075,7 +4093,7 @@ charsToString(int c, ...)
   va_start(vargs, c);
 
   while (c != '\0') {
-    str += (char) c;
+    str += char(c);
 
     c = va_arg(vargs, int);
   }
@@ -4093,7 +4111,7 @@ stringExpand(const std::string &str, std::vector<std::string> &ostrs)
 
   uint count = 0;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   for (uint i = 0; i < len; ++i)
     if (str[i] == '%')
@@ -4117,12 +4135,12 @@ void
 CStrUtil::
 stringExpand1(const std::vector<std::string> &istrs, std::vector<std::string> &ostrs)
 {
-  uint num_strs = istrs.size();
+  uint num_strs = uint(istrs.size());
 
   for (uint i = 0; i < num_strs; ++i) {
    const std::string &str = istrs[i];
 
-    uint len = str.size();
+    uint len = uint(str.size());
 
     for (uint j = 0; j < len; ++j) {
       char c = str[j];
@@ -4182,7 +4200,7 @@ CStrUtil::
 stringExpand2(const std::string &lhs, const std::string &rhs,
               const std::string &chars, std::vector<std::string> &strs)
 {
-  uint len = chars.size();
+  uint len = uint(chars.size());
 
   for (uint i = 0; i < len; ++i)
     strs.push_back(lhs + chars[i] + rhs);
@@ -4192,14 +4210,14 @@ std::string
 CStrUtil::
 caseSepToUnderscoreSep(const std::string &str)
 {
-  int len = str.size();
+  uint len = uint(str.size());
 
   std::string str1;
 
-  for (int i = 0; i < len; ++i) {
+  for (uint i = 0; i < len; ++i) {
     if (i > 0 && ::isupper(str[i])) {
       str1 += "_";
-      str1 += tolower(str[i]);
+      str1 += char(tolower(str[i]));
     }
     else
       str1 += str[i];
@@ -4212,16 +4230,16 @@ std::string
 CStrUtil::
 underscoreSepToCaseSep(const std::string &str)
 {
-  int len = str.size();
+  uint len = uint(str.size());
 
   std::string str1;
 
-  for (int i = 0; i < len; ++i) {
+  for (uint i = 0; i < len; ++i) {
     if (i > 0 && i < len - 1 && str[i] == '_' &&
         (::islower(str[i + 1]) || ::isdigit(str[i + 1]))) {
       ++i;
 
-      str1 += toupper(str[i]);
+      str1 += char(toupper(str[i]));
     }
     else
       str1 += str[i];
@@ -4419,7 +4437,7 @@ toEnglish(uint i)
       case  90: return "ninety";
       case 100: return "one hundred";
       default: {
-        int tens = i/10;
+        uint tens = i/10;
 
         return toEnglish(10*tens) + " " + toEnglish(i - 10*tens);
       }
@@ -4427,8 +4445,8 @@ toEnglish(uint i)
   }
 
   if (i < 1000) {
-    int hundreds = i/100;
-    int units    = i - 100*hundreds;
+    uint hundreds = i/100;
+    uint units    = i - 100*hundreds;
 
     if (units > 0)
       return toEnglish(hundreds) + " hundred and " + toEnglish(units);
@@ -4437,8 +4455,8 @@ toEnglish(uint i)
   }
 
   if (i < 1000000) {
-    int thousands = i/1000;
-    int units     = i - 1000*thousands;
+    uint thousands = i/1000;
+    uint units     = i - 1000*thousands;
 
     if (units > 0)
       return toEnglish(thousands) + " thousand " + toEnglish(units);
@@ -4446,8 +4464,8 @@ toEnglish(uint i)
       return toEnglish(thousands) + " thousand";
   }
 
-  int millions = i/1000000;
-  int units    = i - 1000000*millions;
+  uint millions = i/1000000;
+  uint units    = i - 1000000*millions;
 
   if (units > 0)
     return toEnglish(millions) + " million " + toEnglish(units);
@@ -4478,7 +4496,7 @@ void
 CStrUtil::
 permute(const std::string &word, uint n)
 {
-  uint len = word.size();
+  uint len = uint(word.size());
 
   std::vector<char> src(word.begin(), word.end());
 
@@ -4647,7 +4665,7 @@ readFormat(const std::string &str, uint *pos, std::string &format, int *field_wi
 {
   uint save_pos = *pos;
 
-  uint len = str.size();
+  uint len = uint(str.size());
 
   format = "";
 
@@ -4903,11 +4921,13 @@ void
 CStrWords::
 truncate(int start, int end)
 {
+  if (start < 0 || end <= start) return;
+
   std::vector<CStrWord> word_datas1;
 
-  int delta = word_datas_[start].getStartPos();
+  int delta = word_datas_[uint(start)].getStartPos();
 
-  for (int i = start; i <= end; i++) {
+  for (uint i = uint(start); i <= uint(end); ++i) {
     word_datas_[i].shift(-delta);
 
     word_datas1.push_back(word_datas_[i]);
@@ -4922,13 +4942,14 @@ void
 CStrWords::
 truncateWord(int pos, int start, int end)
 {
-  int new_size = end - start + 1;
+  if (end <= start) return;
 
-  int delta = new_size - word_datas_[pos].size();
+  uint new_size = uint(end - start + 1);
+  int delta = int(new_size - uint(word_datas_[uint(pos)].size()));
 
-  word_datas_[pos].truncate(start, end);
+  word_datas_[uint(pos)].truncate(start, end);
 
-  for (uint i = pos + 1; i < word_datas_.size(); i++)
+  for (uint i = uint(pos + 1); i < word_datas_.size(); ++i)
     word_datas_[i].shift(delta);
 
   str_ = CStrUtil::toString(*this, " ");
