@@ -14,11 +14,15 @@ std::string
 CPrintF::
 format() const
 {
+  auto allocN = [](int n) {
+    return reinterpret_cast<char *>(malloc(size_t(n)));
+  };
+
   std::string str = "";
 
-  int format_len = format_.size();
+  auto format_len = format_.size();
 
-  int i = 0;
+  size_t i = 0;
 
   while (i < format_len) {
     switch (format_[i]) {
@@ -30,7 +34,7 @@ format() const
 
         value_format += format_[i++];
 
-        while (i < format_len && strchr("-+ #0", format_[i]) != NULL)
+        while (i < format_len && strchr("-+ #0", format_[i]) != nullptr)
           value_format += format_[i++];
 
         if (format_[i] == '*') {
@@ -59,7 +63,7 @@ format() const
 
         int format_qualifier = '\0';
 
-        while (i < format_len && strchr("hlL", format_[i]) != NULL) {
+        while (i < format_len && strchr("hlL", format_[i]) != nullptr) {
           if      (format_[i] == 'l' && format_qualifier == 'l')
             format_qualifier = 'j';
           else if (format_qualifier == '\0')
@@ -72,14 +76,14 @@ format() const
 
         value_format += format_[i++];
 
-        if (strchr("diouxXfeEgGcs%", format_code) == NULL) {
+        if (strchr("diouxXfeEgGcs%", format_code) == nullptr) {
           str += value_format;
 
           break;
         }
 
         if (format_code == '%') {
-          str += (char) format_code;
+          str += char(format_code);
 
           break;
         }
@@ -105,20 +109,20 @@ format() const
             LLong integer;
 
             if      (format_qualifier == 'h')
-              integer = (LLong) getInt();
+              integer = LLong(getInt());
             else if (format_qualifier == 'l')
-              integer = (LLong) getLong();
+              integer = LLong(getLong());
             else if (format_qualifier == 'j')
-              integer = (LLong) getLongLong();
+              integer = LLong(getLongLong());
             else
-              integer = (LLong) getInt();
+              integer = LLong(getInt());
 
             if (format_code == 'c') {
-              if (integer == 0 || ! isprint(integer))
+              if (integer == 0 || ! isprint(char(integer)))
                 integer = '.';
             }
 
-            char *buffer = (char *) malloc(field_width + precision + 256);
+            char *buffer = allocN(int(field_width) + precision + 256);
 
             const char *value_format1 = value_format.c_str();
 
@@ -133,7 +137,7 @@ format() const
 
             str += buffer;
 
-            free((char *) buffer);
+            free(reinterpret_cast<char *>(buffer));
 
             break;
           }
@@ -141,7 +145,7 @@ format() const
           case 's': {
             std::string str1 = getString();
 
-            char *buffer = (char *) malloc(field_width + precision + str1.size() + 256);
+            char *buffer = allocN(int(field_width) + precision + int(str1.size()) + 256);
 
             const char *value_format1 = value_format.c_str();
 
@@ -156,7 +160,7 @@ format() const
 
             str += buffer;
 
-            free((char *) buffer);
+            free(reinterpret_cast<char *>(buffer));
 
             break;
           }
@@ -168,7 +172,7 @@ format() const
           case 'G': {
             double real = getDouble();
 
-            char *buffer = (char *) malloc(field_width + precision + 256);
+            char *buffer = allocN(int(field_width) + precision + 256);
 
             const char *value_format1 = value_format.c_str();
 
@@ -183,7 +187,7 @@ format() const
 
             str += buffer;
 
-            free((char *) buffer);
+            free(reinterpret_cast<char *>(buffer));
 
             break;
           }
@@ -208,7 +212,7 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 {
   int save_pos = *pos;
 
-  int len = str.size();
+  auto len = str.size();
 
   format = "";
 
@@ -216,30 +220,30 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 
   /* Required '%' */
 
-  if (*pos >= len || str[*pos] != '%') {
+  if (*pos >= int(len) || str[size_t(*pos)] != '%') {
     *pos = save_pos;
     return false;
   }
 
-  format += str[(*pos)++];
+  format += str[size_t((*pos)++)];
 
   /*------*/
 
   /* Optional '-+ #0' chars (multiples valid ?) */
 
-  while (*pos < len && strchr("-+ #0", str[*pos]) != NULL) {
-    if      (str[*pos] == '-')
+  while (size_t(*pos) < len && strchr("-+ #0", str[size_t(*pos)]) != nullptr) {
+    if      (str[size_t(*pos)] == '-')
       *flags |= LEFT_JUSTIFY;
-    else if (str[*pos] == '+')
+    else if (str[size_t(*pos)] == '+')
       *flags |= DISPLAY_SIGN;
-    else if (str[*pos] == ' ')
+    else if (str[size_t(*pos)] == ' ')
       *flags |= PAD_POSITIVE;
-    else if (str[*pos] == '#')
+    else if (str[size_t(*pos)] == '#')
       *flags |= USE_ALTERNATE;
-    else if (str[*pos] == '0')
+    else if (str[size_t(*pos)] == '0')
       *flags |= ZERO_PAD;
 
-    format += str[(*pos)++];
+    format += str[size_t((*pos)++)];
   }
 
   /*------*/
@@ -248,16 +252,16 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 
   *field_width = -1;
 
-  if (*pos < len && str[*pos] == '*') {
+  if (size_t(*pos) < len && str[size_t(*pos)] == '*') {
     *flags |= FIELD_WIDTH_AS_VALUE;
 
-    format += str[(*pos)++];
+    format += str[size_t((*pos)++)];
   }
   else {
     std::string field_width_str;
 
-    while (*pos < len && isdigit(str[*pos]))
-      field_width_str += str[(*pos)++];
+    while (size_t(*pos) < len && isdigit(str[size_t(*pos)]))
+      field_width_str += str[size_t((*pos)++)];
 
     *field_width = atoi(field_width_str.c_str());
 
@@ -270,21 +274,21 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 
   *precision = -1;
 
-  if (*pos < len && str[*pos] == '.') {
-    format = str[(*pos)++];
+  if (size_t(*pos) < len && str[size_t(*pos)] == '.') {
+    format = str[size_t((*pos)++)];
 
     /* optional precision value */
 
-    if (*pos < len && str[*pos] == '*') {
+    if (size_t(*pos) < len && str[size_t(*pos)] == '*') {
       *flags |= PRECISION_AS_VALUE;
 
-      format = str[(*pos)++];
+      format = str[size_t((*pos)++)];
     }
     else {
       std::string precision_str;
 
-      while (*pos < len && isdigit(str[*pos]))
-        precision_str += str[(*pos)++];
+      while (size_t(*pos) < len && isdigit(str[size_t(*pos)]))
+        precision_str += str[size_t((*pos)++)];
 
       *precision = atoi(precision_str.c_str());
 
@@ -296,9 +300,9 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 
   /* optional length modifier */
 
-  if (*pos < len &&
-      (str[*pos] == 'h' || str[*pos] == 'l' ||  str[*pos] == 'L')) {
-    *length_modifier = str[(*pos)++];
+  if (size_t(*pos) < len &&
+      (str[size_t(*pos)] == 'h' || str[size_t(*pos)] == 'l' || str[size_t(*pos)] == 'L')) {
+    *length_modifier = str[size_t((*pos)++)];
 
     format += *length_modifier;
   }
@@ -307,12 +311,12 @@ readFormat(const std::string &str, int *pos, std::string &format, int *field_wid
 
   /* Required format code */
 
-  if (*pos >= len) {
+  if (size_t(*pos) >= len) {
     *pos = save_pos;
     return false;
   }
 
-  *format_code = str[(*pos)++];
+  *format_code = str[size_t((*pos)++)];
 
   format += format_code;
 
@@ -332,7 +336,7 @@ readRealFormat(const std::string &str, int *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("feEgG", format_code) == NULL)
+  if (strchr("feEgG", format_code) == nullptr)
     return false;
 
   return true;
@@ -351,7 +355,7 @@ readIntegerFormat(const std::string &str, int *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("diouxXc", format_code) == NULL)
+  if (strchr("diouxXc", format_code) == nullptr)
     return false;
 
   return true;
@@ -380,15 +384,15 @@ std::string
 CPrintF::
 formatStrings(const char *fmt, const std::vector<std::string> &strs)
 {
-  uint num_strs = strs.size();
+  auto num_strs = strs.size();
 
   std::string format(fmt);
 
   std::string str = "";
 
-  int format_len = format.size();
+  auto format_len = format.size();
 
-  int i = 0;
+  uint i = 0;
 
   while (i < format_len) {
     switch (format[i]) {
@@ -411,7 +415,7 @@ formatStrings(const char *fmt, const std::vector<std::string> &strs)
         uint arg_num = 0;
 
         while (i < format_len && isdigit(format[i])) {
-          arg_num = arg_num*10 + (format[i] - '0');
+          arg_num = arg_num*10 + uint(format[i] - '0');
 
           value_format += format[i++];
         }

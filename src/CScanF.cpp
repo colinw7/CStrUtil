@@ -17,11 +17,11 @@ scan(const std::string &str)
 {
   ns_ = 0;
 
-  int fpos = 0;
-  int flen = format_.size();
+  size_t fpos = 0;
+  auto   flen = format_.size();
 
-  int spos = 0;
-  int slen = str.size();
+  size_t spos = 0;
+  auto   slen = str.size();
 
   while (fpos < flen) {
     // match any amount of white space
@@ -102,7 +102,7 @@ scan(const std::string &str)
         while (spos < slen && isspace(str[spos]))
           ++spos;
 
-        uint pos  = spos;
+        uint pos  = uint(spos);
         long ival = 0;
 
         if (! CStrUtil::readInteger(str, &pos, &ival))
@@ -166,7 +166,7 @@ scan(const std::string &str)
           }
         }
         else {
-          uint pos = spos;
+          uint pos = uint(spos);
 
           if (! CStrUtil::readInteger(str, &pos, &ival))
             return false;
@@ -233,7 +233,7 @@ scan(const std::string &str)
         while (spos < slen && isspace(str[spos]))
           ++spos;
 
-        uint   pos  = spos;
+        uint   pos  = uint(spos);
         double rval = 0;
 
         if (! CStrUtil::readReal(str, &pos, &rval))
@@ -329,7 +329,7 @@ scan(const std::string &str)
       else if (format_[fpos] == 'n') {
         ++fpos;
 
-        int n = spos;
+        int n = int(spos);
 
         addInteger(n);
 
