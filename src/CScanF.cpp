@@ -113,7 +113,8 @@ scan(const std::string &str)
         if (c == 'u' && ival < 0)
           return false;
 
-        addInteger(ival);
+        if (! ignore)
+          addInteger(ival);
 
         ++ns_;
       }
@@ -172,7 +173,8 @@ scan(const std::string &str)
             return false;
         }
 
-        addInteger(ival);
+        if (! ignore)
+          addInteger(ival);
 
         ++ns_;
       }
@@ -194,7 +196,8 @@ scan(const std::string &str)
           ++spos;
         }
 
-        addInteger(ival);
+        if (! ignore)
+          addInteger(ival);
 
         ++ns_;
       }
@@ -221,7 +224,8 @@ scan(const std::string &str)
 
         ival = h;
 
-        addInteger(ival);
+        if (! ignore)
+          addInteger(ival);
 
         ++ns_;
       }
@@ -241,7 +245,8 @@ scan(const std::string &str)
 
         spos = pos;
 
-        addReal(rval);
+        if (! ignore)
+          addReal(rval);
 
         ++ns_;
       }
@@ -257,7 +262,8 @@ scan(const std::string &str)
         while (spos < slen && ! isspace(str[spos]))
           s += str[spos++];
 
-        addString(s);
+        if (! ignore)
+          addString(s);
 
         ++ns_;
       }
@@ -274,7 +280,8 @@ scan(const std::string &str)
           --n;
         }
 
-        addString(s);
+        if (! ignore)
+          addString(s);
 
         ++ns_;
       }
@@ -313,10 +320,17 @@ scan(const std::string &str)
 
         std::string s;
 
-        while (spos < slen && chars.find(str[spos]) != chars.end())
-          s += str[spos++];
+        if (! invert) {
+          while (spos < slen && chars.find(str[spos]) != chars.end())
+            s += str[spos++];
+        }
+        else {
+          while (spos < slen && chars.find(str[spos]) == chars.end())
+            s += str[spos++];
+        }
 
-        addString(s);
+        if (! ignore)
+          addString(s);
 
         ++ns_;
       }
@@ -331,7 +345,8 @@ scan(const std::string &str)
 
         int n = int(spos);
 
-        addInteger(n);
+        if (! ignore)
+          addInteger(n);
 
         ++ns_;
       }

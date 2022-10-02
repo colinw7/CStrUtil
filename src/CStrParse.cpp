@@ -37,9 +37,9 @@ CStrParse::
 setPos(int pos)
 {
   if (pos < 0        ) pos = 0;
-  if (pos > int(len_)) pos = len_;
+  if (pos > int(len_)) pos = int(len_);
 
-  uint pos1 = pos;
+  uint pos1 = uint(pos);
 
   if      (pos1 > pos_) {
     while (pos_ < pos1) {
@@ -144,7 +144,7 @@ CStrParse::
 getCharAt(int pos) const
 {
   if (pos >= 0 && pos_ < len_)
-    return str_[pos];
+    return str_[uint(pos)];
 
   return '\0';
 }
@@ -169,7 +169,7 @@ skipSpace()
 
   CStrUtil::skipSpace(str_, &pos1);
 
-  setPos(pos1);
+  setPos(int(pos1));
 }
 
 void
@@ -182,7 +182,7 @@ skipNonSpace()
 
   CStrUtil::skipNonSpace(str_, &pos1);
 
-  setPos(pos1);
+  setPos(int(pos1));
 }
 
 bool
@@ -238,7 +238,7 @@ readBracedString(std::string &text, bool includeBraces)
   else
     skipChar();
 
-  int pos1 = getPos();
+  int pos1 = int(getPos());
 
   int nbraces = 1;
 
@@ -256,9 +256,9 @@ readBracedString(std::string &text, bool includeBraces)
     skipChar();
   }
 
-  int pos2 = getPos();
+  int pos2 = int(getPos());
 
-  text += getAt(pos1, pos2 - pos1);
+  text += getAt(uint(pos1), uint(pos2 - pos1));
 
   if (eof())
     return false;
@@ -295,7 +295,7 @@ skipChar()
   if (eof())
     return false;
 
-  setPos(pos_ + 1);
+  setPos(int(pos_ + 1));
 
   return true;
 }
@@ -312,7 +312,7 @@ skipChar(char c)
   if (str_[pos_] != c)
     return false;
 
-  setPos(pos_ + 1);
+  setPos(int(pos_ + 1));
 
   return true;
 }
@@ -321,7 +321,7 @@ bool
 CStrParse::
 skipChars(const std::string &s)
 {
-  return skipChars(s.size());
+  return skipChars(uint(s.size()));
 }
 
 bool
@@ -329,11 +329,11 @@ CStrParse::
 skipChars(uint n)
 {
   if (pos_ + n > len_) {
-    setPos(len_);
+    setPos(int(len_));
     return false;
   }
 
-  setPos(pos_ + n);
+  setPos(int(pos_ + n));
 
   return true;
 }
@@ -360,7 +360,7 @@ skipString()
   else
     return false;
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return true;
 }
@@ -369,7 +369,7 @@ void
 CStrParse::
 skipToEnd()
 {
-  setPos(len_);
+  setPos(int(len_));
 }
 
 bool
@@ -379,7 +379,7 @@ readNonSpace(std::string &text)
   if (eof() || isspace(str_[pos_]))
     return false;
 
-  int pos = pos_;
+  uint pos = pos_;
 
   skipNonSpace();
 
@@ -398,7 +398,7 @@ readChar()
 
   char c = str_[pos_];
 
-  setPos(pos_ + 1);
+  setPos(int(pos_ + 1));
 
   return c;
 }
@@ -414,7 +414,7 @@ readChar(char *c)
 
   *c = str_[pos_];
 
-  setPos(pos_ + 1);
+  setPos(int(pos_ + 1));
 
   return true;
 }
@@ -428,9 +428,9 @@ readUtf8Char(ulong *c)
   if (eof())
     return false;
 
-  int pos1 = pos_;
+  int pos1 = int(pos_);
 
-  *c = CUtf8::readNextChar(str_, pos1, len_);
+  *c = CUtf8::readNextChar(str_, pos1, uint(len_));
 
   setPos(pos1);
 
@@ -444,7 +444,7 @@ unreadChar()
   if (pos_ == 0)
     return false;
 
-  setPos(pos_ - 1);
+  setPos(int(pos_ - 1));
 
   return true;
 }
@@ -453,7 +453,7 @@ bool
 CStrParse::
 unreadString(const std::string &str)
 {
-  uint len = str.size();
+  auto len = str.size();
 
   if (pos_ < len) {
     setPos(0);
@@ -461,7 +461,7 @@ unreadString(const std::string &str)
     return false;
   }
   else {
-    setPos(pos_ - len);
+    setPos(int(pos_ - len));
 
     return true;
   }
@@ -477,7 +477,7 @@ readNumber(double &real, int &integer, bool &is_real)
 
   bool b = CStrUtil::readNumber(str_, &pos1, real, integer, is_real);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -492,7 +492,7 @@ readInteger(int *integer)
 
   bool b = CStrUtil::readInteger(str_, &pos1, integer);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -507,7 +507,7 @@ readInteger(long *integer)
 
   bool b = CStrUtil::readInteger(str_, &pos1, integer);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -520,9 +520,9 @@ readBaseInteger(int base, int *integer)
 
   uint pos1 = pos_;
 
-  bool b = CStrUtil::readBaseInteger(str_, base, &pos1, integer);
+  bool b = CStrUtil::readBaseInteger(str_, uint(base), &pos1, integer);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -535,9 +535,9 @@ readBaseInteger(int base, long *integer)
 
   uint pos1 = pos_;
 
-  bool b = CStrUtil::readBaseInteger(str_, base, &pos1, integer);
+  bool b = CStrUtil::readBaseInteger(str_, uint(base), &pos1, integer);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -553,7 +553,7 @@ readReal(double *real)
   if (! CStrUtil::readReal(str_, &pos1, real))
     return false;
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return true;
 
@@ -565,7 +565,7 @@ readString(std::string &str, bool strip_quotes)
 {
   autoSkipSpace();
 
-  int pos = pos_;
+  uint pos = pos_;
 
   if (! skipString())
     return false;
@@ -587,7 +587,7 @@ skipToChar(char c)
   while (pos1 < len_ && str_[pos1] != c)
     ++pos1;
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   if (eof())
     return false;
@@ -606,7 +606,7 @@ readToChar(char c, std::string &text)
   while (pos1 < len_ && str_[pos1] != c)
     text += str_[pos1++];
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   if (eof())
     return false;
@@ -618,7 +618,7 @@ bool
 CStrParse::
 isIdentifier(int offset)
 {
-  return CStrUtil::isIdentifier(str_, pos_ + offset);
+  return CStrUtil::isIdentifier(str_, uint(int(pos_) + offset));
 }
 
 bool
@@ -631,7 +631,7 @@ readIdentifier(std::string &identifier)
 
   bool b = CStrUtil::readIdentifier(str_, &pos1, identifier);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -646,7 +646,7 @@ readRealFormat(std::string &real_format)
 
   bool b = CStrUtil::readRealFormat(str_, &pos1, real_format);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -661,7 +661,7 @@ readIntegerFormat(std::string &integer_format)
 
   bool b = CStrUtil::readIntegerFormat(str_, &pos1, integer_format);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -676,7 +676,7 @@ readStringFormat(std::string &string_format)
 
   bool b = CStrUtil::readStringFormat(str_, &pos1, string_format);
 
-  setPos(pos1);
+  setPos(int(pos1));
 
   return b;
 }
@@ -753,7 +753,7 @@ bool
 CStrParse::
 isDigitAt(int offset) const
 {
-  return (pos_ + offset < len_ && isdigit(str_[pos_ + offset]));
+  return (uint(int(pos_) + offset) < len_ && isdigit(str_[uint(int(pos_) + offset)]));
 }
 
 bool
@@ -806,12 +806,12 @@ bool
 CStrParse::
 isString(const std::string &str) const
 {
-  int len = str.size();
+  auto len = str.size();
 
   if (pos_ + len > len_)
     return false;
 
-  for (int i = 0; i < len; ++i)
+  for (uint i = 0; i < len; ++i)
     if (str_[pos_ + i] != str[i])
       return false;
 
@@ -822,12 +822,12 @@ bool
 CStrParse::
 isStringEnd(const std::string &str) const
 {
-  int len = str.size();
+  auto len = str.size();
 
   if (pos_ + len != len_)
     return false;
 
-  for (int i = 0; i < len; ++i)
+  for (uint i = 0; i < len; ++i)
     if (str_[pos_ + i] != str[i])
       return false;
 
@@ -847,12 +847,12 @@ bool
 CStrParse::
 isWord(const std::string &str) const
 {
-  int len = str.size();
+  auto len = str.size();
 
   if (pos_ + len > len_)
     return false;
 
-  for (int i = 0; i < len; ++i)
+  for (uint i = 0; i < len; ++i)
     if (str_[pos_ + i] != str[i])
       return false;
 
@@ -873,14 +873,14 @@ bool
 CStrParse::
 neof(int n) const
 {
-  return (pos_ + n >= len_);
+  return (pos_ + uint(n) >= len_);
 }
 
 void
 CStrParse::
 setEof()
 {
-  pos_ = len_;
+  pos_ = uint(len_);
 }
 
 void

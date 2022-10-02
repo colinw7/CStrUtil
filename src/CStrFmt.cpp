@@ -3,18 +3,18 @@
 
 class CStrFmtFormat {
  public:
-  CStrFmtFormat(const std::string &str, int width, CStrFmt::AlignType alighType);
+  CStrFmtFormat(const std::string &str, uint width, CStrFmt::AlignType alighType);
  ~CStrFmtFormat();
 
   std::vector<std::string> format();
 
  private:
   void addWord();
-  bool isSplitter(const std::string &sstr, int pos);
+  bool isSplitter(const std::string &sstr, uint pos);
 
  private:
   std::string              str;
-  int                      width { 0 };
+  uint                     width { 0 };
   CStrFmt::AlignType       alighType;
   std::vector<std::string> lines;
   std::string              line;
@@ -26,7 +26,7 @@ class CStrFmtFormat {
 
 std::vector<std::string>
 CStrFmt::
-format(const std::string &str, int width, CStrFmt::AlignType alighType)
+format(const std::string &str, uint width, CStrFmt::AlignType alighType)
 {
   CStrFmtFormat fmt(str, width, alighType);
 
@@ -36,7 +36,7 @@ format(const std::string &str, int width, CStrFmt::AlignType alighType)
 //---
 
 CStrFmtFormat::
-CStrFmtFormat(const std::string &str1, int width1, CStrFmt::AlignType alighType1) :
+CStrFmtFormat(const std::string &str1, uint width1, CStrFmt::AlignType alighType1) :
  str(str1), width(width1), alighType(alighType1)
 {
   lastChar = '\0';
@@ -61,9 +61,9 @@ format()
 
   lastChar = '\0';
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (uint i = 0; i < len; i++) {
     if      (str[i] == '\n') {
       addWord();
 
@@ -95,9 +95,9 @@ format()
 
   //------
 
-  int num_lines = lines.size();
+  auto num_lines = lines.size();
 
-  for (int i = 0; i < num_lines; i++)
+  for (uint i = 0; i < num_lines; i++)
     lines[i] = CStrFmt::align(lines[i], width, alighType, '\0');
 
   return lines;
@@ -110,13 +110,13 @@ addWord()
   if (word.size() == 0)
     return;
 
-  int lastChar_len = 0;
+  uint lastChar_len = 0;
 
   if (lastChar != '\0')
     lastChar_len = 1;
 
-  int line_len = line.size();
-  int word_len = word.size();
+  auto line_len = line.size();
+  auto word_len = word.size();
 
   if (line_len + word_len + lastChar_len > width) {
     if (word_len > width) {
@@ -158,27 +158,27 @@ addWord()
 
 std::string
 CStrFmt::
-align(const std::string &str, int width, AlignType alighType, char pad_char, ClipType clipType)
+align(const std::string &str, uint width, AlignType alighType, char pad_char, ClipType clipType)
 {
   static int direction = 0;
 
   std::string str1;
 
-  int strLen = str.size();
+  auto strLen = uint(str.size());
 
-  if (width > 0 && strLen > width) {
+  if (width > 0 && strLen > uint(width)) {
     if (clipType == ClipType::NONE)
       return str;
 
-    int nc = strLen - width;
+    uint nc = strLen - uint(width);
 
     if      (clipType == ClipType::LEFT)
       str1 = str.substr(nc, width);
     else if (clipType == ClipType::RIGHT)
       str1 = str.substr(0, width);
     else if (clipType == ClipType::MIDDLE) {
-      int nl = width/2;
-      int nr = width - nl;
+      uint nl = width/2;
+      uint nr = uint(std::max(width - nl, 0U));
 
       str1 = str.substr(0, nl) + str.substr(nl + nc, nr);
     }
@@ -190,13 +190,13 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
   std::string str2 = "";
 
-  int str2_len = 0;
+  uint str2_len = 0;
 
   if (alighType == AlignType::JUSTIFY) {
-    int num_chars = 0;
-    int num_words = 1;
+    uint num_chars = 0;
+    uint num_words = 1;
 
-    int i = 0;
+    uint i = 0;
 
     while (i < strLen) {
       if (! isspace(str1[i])) {
@@ -216,7 +216,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
     //------
 
-    int num_pads = width - num_chars;
+    uint num_pads = uint(std::max(width - num_chars, 0U));
 
     //------
 
@@ -226,11 +226,11 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
       int *pads = new int [num_words - 1];
 
-      for (int ii = 0; ii < num_words - 1; ii++)
+      for (uint ii = 0; ii < uint(num_words - 1); ii++)
         pads[ii] = 0;
 
       if (direction == 0) {
-        int ii = 0;
+        uint ii = 0;
 
         while (num_pads > 0) {
           pads[ii++]++;
@@ -244,7 +244,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
         direction = 1;
       }
       else {
-        int ii = num_words - 2;
+        int ii = int(num_words - 2);
 
         while (num_pads > 0) {
           pads[ii--]++;
@@ -252,7 +252,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
           num_pads--;
 
           if (ii < 0)
-            ii = num_words - 2;
+            ii = int(num_words - 2);
         }
 
         direction = 0;
@@ -262,7 +262,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
       num_words = 0;
 
-      int ii = 0;
+      uint ii = 0;
 
       while (ii < strLen) {
         if (isspace(str1[ii])) {
@@ -309,16 +309,16 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
   /* Left, Centre or Right Align Line */
 
   else {
-    int num_pads = width - strLen;
+    uint num_pads = uint(std::max(width - strLen, 0U));
 
     //------
 
-    int pad_left  = 0;
-    int pad_right = 0;
+    uint pad_left  = 0;
+    uint pad_right = 0;
 
     if      (alighType == AlignType::CENTER) {
       pad_left  = num_pads/2;
-      pad_right = num_pads - num_pads/2;
+      pad_right = std::max(num_pads - num_pads/2, 0u);
     }
     else if (alighType == AlignType::RIGHT)
       pad_left  = num_pads;
@@ -328,7 +328,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
     //------
 
     if (pad_char != '\0') {
-      for (int j = 0; j < pad_left; j++) {
+      for (uint j = 0; j < pad_left; j++) {
         str2 += pad_char;
 
         ++str2_len;
@@ -340,7 +340,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
     str2_len += strLen;
 
     if (pad_char != '\0') {
-      for (int j = 0; j < pad_right; j++) {
+      for (uint j = 0; j < pad_right; j++) {
         str2 += pad_char;
 
         ++str2_len;
@@ -353,7 +353,7 @@ align(const std::string &str, int width, AlignType alighType, char pad_char, Cli
 
 bool
 CStrFmtFormat::
-isSplitter(const std::string &sstr, int pos)
+isSplitter(const std::string &sstr, uint pos)
 {
   /* Space is a Splitter ... */
 
@@ -365,7 +365,7 @@ isSplitter(const std::string &sstr, int pos)
   /* Punctuation Characters followed by an End of String or
      a Space are Splitters ... */
 
-  int strLen = sstr.size();
+  auto strLen = sstr.size();
 
   if (ispunct(sstr[pos]) && (pos == strLen - 1 || isspace(sstr[pos + 1])))
     return true;
