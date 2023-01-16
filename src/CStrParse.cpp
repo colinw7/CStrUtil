@@ -357,6 +357,10 @@ skipString()
     if (! CStrUtil::skipSingleQuotedString(str_, &pos1))
       return false;
   }
+  else if (str_[pos1] == '`') {
+    if (! CStrUtil::skipBackQuotedString(str_, &pos1))
+      return false;
+  }
   else
     return false;
 

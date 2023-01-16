@@ -122,6 +122,9 @@ std::string
 CStrUtil::
 toString(const std::vector<std::string> &words, const std::string &sep)
 {
+  if (words.empty())
+    return "";
+
   return toString(words, 0, -1, sep);
 }
 
@@ -129,6 +132,9 @@ std::string
 CStrUtil::
 toString(const std::vector<std::string> &words, int start, int end, const std::string &sep)
 {
+  if (words.empty())
+    return "";
+
   assert(start >= 0);
 
   std::string str;
@@ -2009,6 +2015,13 @@ skipDoubleQuotedString(const std::string &str, uint *pos)
 {
   uint len = uint(str.size());
 
+  return skipDoubleQuotedString(str, pos, len);
+}
+
+bool
+CStrUtil::
+skipDoubleQuotedString(const std::string &str, uint *pos, uint len)
+{
   if (*pos >= len || str[*pos] != '\"')
     return false;
 
@@ -2041,6 +2054,13 @@ skipSingleQuotedString(const std::string &str, uint *pos)
 {
   uint len = uint(str.size());
 
+  return skipSingleQuotedString(str, pos, len);
+}
+
+bool
+CStrUtil::
+skipSingleQuotedString(const std::string &str, uint *pos, uint len)
+{
   if (*pos >= len || str[*pos] != '\'')
     return false;
 
@@ -3280,28 +3300,21 @@ replaceEscapeCodes(const std::string &str)
 
       case 'x': {
         if (i < len - 1 && ::isxdigit(str[i + 1])) {
-          int hex_value = 0;
+          uint hex_value = 0;
 
           ++i;
 
-          if      (::isdigit(str[i]))
-            hex_value += (str[i] - '0');
-          else if (::islower(str[i]))
-            hex_value += (str[i] - 'a' + 10);
-          else
-            hex_value += (str[i] - 'A' + 10);
+          uint hex_value1;
+
+            hex_value += hex_value1;
 
           if (i < len - 1 && ::isxdigit(str[i + 1])) {
             hex_value *= 16;
 
             ++i;
 
-            if      (::isdigit(str[i]))
-              hex_value += (str[i] - '0');
-            else if (::islower(str[i]))
-              hex_value += (str[i] - 'a' + 10);
-            else
-              hex_value += (str[i] - 'A' + 10);
+            if (decodeHexChar(str[i], &hex_value1))
+              hex_value += hex_value1;
           }
 
           str1 += char(hex_value);
@@ -3389,28 +3402,22 @@ encodeEscapeChar(const std::string &str, char *c)
 
     case 'x': {
       if (pos < len - 1 && ::isxdigit(str[pos + 1])) {
-        int hex_value = 0;
+        uint hex_value = 0;
 
         ++pos;
 
-        if      (::isdigit(str[pos]))
-          hex_value += (str[pos] - '0');
-        else if (::islower(str[pos]))
-          hex_value += (str[pos] - 'a' + 10);
-        else
-          hex_value += (str[pos] - 'A' + 10);
+        uint hex_value1;
+
+        if (decodeHexChar(str[pos], &hex_value1))
+          hex_value += hex_value1;
 
         if (pos < len - 1 && ::isxdigit(str[pos + 1])) {
           hex_value *= 16;
 
           ++pos;
 
-          if      (::isdigit(str[pos]))
-            hex_value += (str[pos] - '0');
-          else if (::islower(str[pos]))
-            hex_value += (str[pos] - 'a' + 10);
-          else
-            hex_value += (str[pos] - 'A' + 10);
+          if (decodeHexChar(str[pos], &hex_value1))
+            hex_value += hex_value1;
         }
 
         *c = char(hex_value);
@@ -3646,8 +3653,8 @@ void
 CStrUtil::
 uniq(const std::vector<std::string> &strs, std::vector<std::string> &uniq_strs)
 {
-  std::vector<std::string>::const_iterator p1 = strs.begin();
-  std::vector<std::string>::const_iterator p2 = strs.end  ();
+  auto p1 = strs.begin();
+  auto p2 = strs.end  ();
 
   std::string last = "";
 
@@ -3717,8 +3724,8 @@ void
 CStrUtil::
 print(std::ostream &os, const std::vector<std::string> &strs)
 {
-  std::vector<std::string>::const_iterator p1 = strs.begin();
-  std::vector<std::string>::const_iterator p2 = strs.end  ();
+  auto p1 = strs.begin();
+  auto p2 = strs.end  ();
 
   bool first = true;
 
@@ -4030,12 +4037,12 @@ concatFileNames(const std::string &lhs, const std::string &rhs)
 
 uint
 CStrUtil::
-maxLen(std::vector<std::string> &strs)
+maxLen(const std::vector<std::string> &strs)
 {
   uint len = 0;
 
-  std::vector<std::string>::const_iterator p1 = strs.begin();
-  std::vector<std::string>::const_iterator p2 = strs.end  ();
+  auto p1 = strs.begin();
+  auto p2 = strs.end  ();
 
   for ( ; p1 != p2; ++p1) {
     uint len1 = uint((*p1).size());
@@ -4635,11 +4642,11 @@ vsprintf(std::string &str, const char *format, va_list *vargs)
      CPrintF(format), vargs_(vargs) {
     }
 
-    int         getInt     () const { return va_arg(*vargs_, int   ); }
-    long        getLong    () const { return va_arg(*vargs_, long  ); }
-    LLong       getLongLong() const { return va_arg(*vargs_, LLong ); }
-    double      getDouble  () const { return va_arg(*vargs_, double); }
-    std::string getString  () const { return va_arg(*vargs_, char *); }
+    int         getInt     () const override { return va_arg(*vargs_, int   ); }
+    long        getLong    () const override { return va_arg(*vargs_, long  ); }
+    LLong       getLongLong() const override { return va_arg(*vargs_, LLong ); }
+    double      getDouble  () const override { return va_arg(*vargs_, double); }
+    std::string getString  () const override { return va_arg(*vargs_, char *); }
   };
 
   PrintF p(format, vargs);

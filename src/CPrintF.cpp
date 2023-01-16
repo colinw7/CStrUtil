@@ -426,7 +426,7 @@ formatStrings(const char *fmt, const std::vector<std::string> &strs)
           break;
         }
 
-        const std::string &str1 = strs[arg_num - 1];
+        const auto &str1 = strs[arg_num - 1];
 
         str += str1;
 

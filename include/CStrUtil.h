@@ -205,7 +205,9 @@ namespace CStrUtil {
   bool skipNonSpace(const std::string &str, uint *pos);
 
   bool skipDoubleQuotedString(const std::string &str, uint *pos);
+  bool skipDoubleQuotedString(const std::string &str, uint *pos, uint len);
   bool skipSingleQuotedString(const std::string &str, uint *pos);
+  bool skipSingleQuotedString(const std::string &str, uint *pos, uint len);
   bool skipBackQuotedString  (const std::string &str, uint *pos);
 
   bool readInteger(const std::string &str, uint *pos, int *integer);
@@ -325,7 +327,7 @@ namespace CStrUtil {
 
   std::string concatFileNames(const std::string &lhs, const std::string &rhs);
 
-  uint maxLen(std::vector<std::string> &words);
+  uint maxLen(const std::vector<std::string> &words);
 
   std::string duplicate(const std::string &str, uint n);
 
