@@ -59,6 +59,8 @@ class CStrParse {
   virtual bool skipString();
   virtual void skipToEnd();
 
+  virtual bool skipLastString() { return skipChars(lastStringLen_); }
+
   virtual void autoSkipSpace() const;
 
   virtual bool readNonSpace(std::string &text);
@@ -138,6 +140,8 @@ class CStrParse {
   int                    lineNum_ { 1 };
   int                    linePos_ { 0 };
   LineLen                lineLen_;
+
+  mutable uint lastStringLen_ { 0 };
 };
 
 #endif

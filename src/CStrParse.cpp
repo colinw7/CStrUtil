@@ -819,6 +819,8 @@ isString(const std::string &str) const
     if (str_[pos_ + i] != str[i])
       return false;
 
+  lastStringLen_ = uint(len);
+
   return true;
 }
 
