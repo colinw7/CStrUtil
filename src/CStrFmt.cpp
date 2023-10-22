@@ -178,7 +178,7 @@ align(const std::string &str, uint width, AlignType alighType, char pad_char, Cl
       str1 = str.substr(0, width);
     else if (clipType == ClipType::MIDDLE) {
       uint nl = width/2;
-      uint nr = uint(std::max(width - nl, 0U));
+      uint nr = (width > nl ? width - nl : 0U);
 
       str1 = str.substr(0, nl) + str.substr(nl + nc, nr);
     }
@@ -216,7 +216,7 @@ align(const std::string &str, uint width, AlignType alighType, char pad_char, Cl
 
     //------
 
-    uint num_pads = uint(std::max(width - num_chars, 0U));
+    uint num_pads = (width > num_chars ? width - num_chars : 0U);
 
     //------
 
@@ -309,7 +309,7 @@ align(const std::string &str, uint width, AlignType alighType, char pad_char, Cl
   /* Left, Centre or Right Align Line */
 
   else {
-    uint num_pads = uint(std::max(width - strLen, 0U));
+    uint num_pads = (width > strLen ? width - strLen : 0U);
 
     //------
 
@@ -318,7 +318,7 @@ align(const std::string &str, uint width, AlignType alighType, char pad_char, Cl
 
     if      (alighType == AlignType::CENTER) {
       pad_left  = num_pads/2;
-      pad_right = std::max(num_pads - num_pads/2, 0u);
+      pad_right = std::max(num_pads - pad_left, 0u);
     }
     else if (alighType == AlignType::RIGHT)
       pad_left  = num_pads;
