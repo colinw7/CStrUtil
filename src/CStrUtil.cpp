@@ -630,7 +630,7 @@ isBaseInteger(const std::string &str, uint base)
   while (i < len) {
     int c = str[i];
 
-    if (! isBaseChar(c, base, 0))
+    if (! isBaseChar(c, base, nullptr))
       return false;
 
     ++i;
@@ -2349,7 +2349,7 @@ CStrUtil::
 toTokens(const std::string &str, const std::string &separators)
 {
   if (separators.size() == 0)
-    return toWords(str, 0);
+    return toWords(str, nullptr);
 
   //------
 
@@ -2592,12 +2592,12 @@ skipBaseInteger(const std::string &str, uint base, uint *pos)
   if (*pos < len && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
 
-  if (*pos >= len || ! isBaseChar(str[*pos], base, 0))
+  if (*pos >= len || ! isBaseChar(str[*pos], base, nullptr))
     return false;
 
   ++(*pos);
 
-  while (*pos < len && isBaseChar(str[*pos], base, 0))
+  while (*pos < len && isBaseChar(str[*pos], base, nullptr))
     ++(*pos);
 
   return true;
@@ -2610,12 +2610,12 @@ skipBaseInteger(const char *str, uint base, uint *pos)
   if (str[*pos] != '\0' && (str[*pos] == '+' || str[*pos] == '-'))
     ++(*pos);
 
-  if (str[*pos] == '\0' || ! isBaseChar(str[*pos], base, 0))
+  if (str[*pos] == '\0' || ! isBaseChar(str[*pos], base, nullptr))
     return false;
 
   ++(*pos);
 
-  while (str[*pos] != '\0' && isBaseChar(str[*pos], base, 0))
+  while (str[*pos] != '\0' && isBaseChar(str[*pos], base, nullptr))
     ++(*pos);
 
   return true;
@@ -3148,7 +3148,7 @@ bool
 CStrUtil::
 isCOperatorChar(char c)
 {
-  return (strchr("()[]+-*/%<>=&|!~^.?:", c) != 0);
+  return (strchr("()[]+-*/%<>=&|!~^.?:", c) != nullptr);
 }
 
 bool
@@ -3193,7 +3193,7 @@ bool
 CStrUtil::
 isCSeparatorChar(char c)
 {
-  return (strchr("{};,", c) != 0);
+  return (strchr("{};,", c) != nullptr);
 }
 
 bool
@@ -3208,7 +3208,7 @@ replaceCTriGraphs(std::string &line)
   while (pos < len) {
     if (pos < len + 2 &&
         line[pos] == '?' && line[pos + 1] == '?' &&
-        strchr("=/'()!<>-", line[pos + 2]) != 0) {
+        strchr("=/'()!<>-", line[pos + 2]) != nullptr) {
       /* Replace Trigraph */
 
       if      (line[pos + 2] == '=')
@@ -3808,7 +3808,7 @@ strstr(const char *p1, const char *p2, const char *str, int len)
     len = int(strlen(str));
 
   if (len == 0)
-    return 0;
+    return nullptr;
 
   char c = str[0];
 
@@ -3824,12 +3824,12 @@ strstr(const char *p1, const char *p2, const char *str, int len)
     ++ps;
 
     if (ps > pe)
-      return 0;
+      return nullptr;
 
     p = strchr(ps, pe, c);
   }
 
-  return 0;
+  return nullptr;
 }
 
 char *
@@ -3840,7 +3840,7 @@ strrstr(const char *p1, const char *p2, const char *str, int len)
     len = int(strlen(str));
 
   if (len == 0)
-    return 0;
+    return nullptr;
 
   char c = str[0];
 
@@ -3856,12 +3856,12 @@ strrstr(const char *p1, const char *p2, const char *str, int len)
     --ps;
 
     if (ps < pe)
-      return 0;
+      return nullptr;
 
     p = strrchr(ps, pe, c);
   }
 
-  return 0;
+  return nullptr;
 }
 
 char *
@@ -3896,7 +3896,7 @@ strchr(const char *p1, const char *p2, char c)
     if (*p == c)
       return const_cast<char *>(p);
 
-  return 0;
+  return nullptr;
 }
 
 char *
@@ -3907,7 +3907,7 @@ strrchr(const char *p1, const char *p2, char c)
     if (*p == c)
       return const_cast<char *>(p);
 
-  return 0;
+  return nullptr;
 }
 
 void
@@ -4288,7 +4288,7 @@ getIsCType(const std::string &is_type)
   else if (CStrUtil::casecmp(is_type, "xdigit") == 0)
     return CStrUtil::isxdigit;
   else
-    return 0;
+    return nullptr;
 }
 
 /* isalnum for machines which only have macro */
@@ -4691,7 +4691,7 @@ readFormat(const std::string &str, uint *pos, std::string &format, int *field_wi
 
   /* Optional '-+ #0' chars (multiples valid ?) */
 
-  while (*pos < len && strchr("-+ #0", str[*pos]) != 0) {
+  while (*pos < len && strchr("-+ #0", str[*pos]) != nullptr) {
     if      (str[*pos] == '-')
       *flags |= CPRINTF_LEFT_JUSTIFY;
     else if (str[*pos] == '+')
@@ -4795,7 +4795,7 @@ readRealFormat(const std::string &str, uint *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("feEgG", format_code) == 0)
+  if (strchr("feEgG", format_code) == nullptr)
     return false;
 
   return true;
@@ -4814,7 +4814,7 @@ readIntegerFormat(const std::string &str, uint *pos, std::string &format)
                    &format_code, &flags))
     return false;
 
-  if (strchr("diouxXc", format_code) == 0)
+  if (strchr("diouxXc", format_code) == nullptr)
     return false;
 
   return true;
