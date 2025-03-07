@@ -164,6 +164,8 @@ namespace CStrUtil {
   std::string replace(const std::string &str, const std::string &old_str,
                       const std::string &new_str);
 
+  std::string replaceChar(const std::string &str, char oldChar, char newChar, bool all=true);
+
   std::string translate(const std::string &str, const std::string &old_chars,
                         const std::string &new_chars, bool remove=false);
 

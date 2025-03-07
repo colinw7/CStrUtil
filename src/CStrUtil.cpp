@@ -1619,15 +1619,35 @@ std::string
 CStrUtil::
 replace(const std::string &str, const std::string &old_str, const std::string &new_str)
 {
-  std::string::size_type pos = str.find(old_str);
+  auto pos = str.find(old_str);
 
   if (pos == std::string::npos)
     return str;
 
-  std::string lhs = str.substr(0, pos);
-  std::string rhs = str.substr(pos + old_str.size());
+  auto lhs = str.substr(0, pos);
+  auto rhs = str.substr(pos + old_str.size());
 
   return (lhs + new_str + rhs);
+}
+
+std::string
+CStrUtil::
+replaceChar(const std::string &str, char oldChar, char newChar, bool all)
+{
+  auto str1 = str;
+
+  auto pos = str1.find(oldChar);
+
+  while (pos != std::string::npos) {
+    str1[pos] = newChar;
+
+    if (! all)
+      break;
+
+    pos = str1.find(oldChar);
+  }
+
+  return str1;
 }
 
 std::string
@@ -1642,7 +1662,7 @@ translate(const std::string &str, const std::string &old_chars,
   uint len = uint(str1.size());
 
   for (uint i = 0; i < len; ++i) {
-    std::string::size_type pos = old_chars.find(str1[i]);
+    auto pos = old_chars.find(str1[i]);
 
     if (pos == std::string::npos)
       continue;
