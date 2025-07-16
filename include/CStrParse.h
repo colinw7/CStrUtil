@@ -50,8 +50,9 @@ class CStrParse {
   virtual char getCharAt    (int pos) const;
   virtual char getCharAfter (uint offset = 1) const;
 
-  virtual void skipSpace();
-  virtual void skipNonSpace();
+  virtual int skipSpace();
+  virtual int skipNonSpace();
+
   virtual bool skipChar();
   virtual bool skipChar(char c);
   virtual bool skipChars(const std::string &s);

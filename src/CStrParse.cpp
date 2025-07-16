@@ -159,30 +159,38 @@ getCharAfter(uint offset) const
     return '\0';
 }
 
-void
+int
 CStrParse::
 skipSpace()
 {
-  if (eof()) return;
+  if (eof()) return 0;
 
   uint pos1 = pos_;
 
   CStrUtil::skipSpace(str_, &pos1);
 
+  auto n = pos1 - pos_;
+
   setPos(int(pos1));
+
+  return n;
 }
 
-void
+int
 CStrParse::
 skipNonSpace()
 {
-  if (eof()) return;
+  if (eof()) return 0;
 
   uint pos1 = pos_;
 
   CStrUtil::skipNonSpace(str_, &pos1);
 
+  auto n = pos1 - pos_;
+
   setPos(int(pos1));
+
+  return n;
 }
 
 bool
