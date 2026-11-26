@@ -327,6 +327,9 @@ namespace CStrUtil {
 
   bool equal(char *str1, char *str2);
 
+  bool startsWith(const std::string &str, const std::string &start);
+  bool endsWith(const std::string &str, const std::string &end);
+
   std::string concatFileNames(const std::string &lhs, const std::string &rhs);
 
   uint maxLen(const std::vector<std::string> &words);

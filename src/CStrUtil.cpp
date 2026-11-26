@@ -4037,6 +4037,22 @@ equal(char *str1, char *str2)
   return (strcmp(str1, str2) == 0);
 }
 
+bool
+CStrUtil::
+startsWith(const std::string &str, const std::string &start)
+{
+  auto pos = str.find(start);
+  return (pos == 0);
+}
+
+bool
+CStrUtil::
+endsWith(const std::string &str, const std::string &end)
+{
+  auto pos = str.find(end);
+  return (pos == str.size() - end.size());
+}
+
 std::string
 CStrUtil::
 concatFileNames(const std::string &lhs, const std::string &rhs)
